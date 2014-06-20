@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+		        <LinearLayout
+		            android:id="@+id/group"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:orientation="horizontal" >
+		
+				            <Button
+				                android:id="@+id/addProject"
+				                android:layout_width="wrap_content"
+				                android:layout_height="wrap_content"
+				                android:onClick="onClick"
+				                android:text="Add New Project" />
+				            
+				
+				            
+				            <EditText 
+							    android:id="@+id/nameToAdd"
+							    android:layout_width="wrap_content"
+					            android:layout_height="wrap_content"
+					            android:layout_margin="10dp"
+							    android:hint="name"
+						 	 />
+		
+		            
+		     	 </LinearLayout>
+			        
+			        <LinearLayout
+			            android:id="@+id/group"
+			            android:layout_width="wrap_content"
+			            android:layout_height="wrap_content" 
+			            android:orientation="horizontal" >
+			
+					            <Button
+					                android:id="@+id/delete"
+					                android:layout_width="wrap_content"
+					                android:layout_height="wrap_content"
+					                android:onClick="onClick"
+					                android:text="Delete First" />
+					            
+					           <EditText 
+								    android:id="@+id/idToDelete"
+								    android:layout_width="wrap_content"
+						            android:layout_height="wrap_content"
+						            android:layout_margin="10dp"
+								    android:hint="id"
+							    />
+					           
+					           
+					           
+					           <TextView
+					            android:layout_width="wrap_content"
+					            android:layout_height="wrap_content"
+					            android:layout_gravity="center"
+					            android:text="or" />
+					           
+					           <EditText 
+								    android:id="@+id/nameToDelete"
+								    android:layout_width="wrap_content"
+						            android:layout_height="wrap_content"
+						            android:layout_margin="10dp"
+								    android:hint="name"
+							    />
+			            
+			        </LinearLayout>
+
+                
+        
+			        <LinearLayout
+			            android:id="@+id/group"
+			            android:layout_width="wrap_content"
+			            android:layout_height="wrap_content" 
+			            android:orientation="horizontal" >
+			
+					            <Button
+					                android:id="@+id/createElementType"
+					                android:layout_width="wrap_content"
+					                android:layout_height="wrap_content"
+					                android:onClick="onClick"
+					                android:text="Generate Types" />            
+					           
+					           <TextView
+					            android:layout_width="wrap_content"
+					            android:layout_height="wrap_content"
+					            android:layout_gravity="center"
+					            android:text="Click one time to create element types in db" />
+					           
+					           					            <Button
+					                android:id="@+id/instanciateElementType"
+					                android:layout_width="wrap_content"
+					                android:layout_height="wrap_content"
+					                android:onClick="onClick"
+					                android:text="instanciate Types" />     
+			            
+			        </LinearLayout>
+        
+	                <LinearLayout
+			            android:id="@+id/group"
+			            android:layout_width="wrap_content"
+			            android:layout_height="wrap_content" 
+			            android:orientation="horizontal" >
+					
+					            <Button
+					                android:id="@+id/createMaterial"
+					                android:layout_width="wrap_content"
+					                android:layout_height="wrap_content"
+					                android:onClick="onClick"
+					                android:text="Generate Materials" />            
+					           
+					           <TextView
+					            android:layout_width="wrap_content"
+					            android:layout_height="wrap_content"
+					            android:layout_gravity="center"
+					            android:text="Click one time to create materials in db" />
+					           
+					           	<Button
+					                android:id="@+id/instanciateMaterial"
+					                android:layout_width="wrap_content"
+					                android:layout_height="wrap_content"
+					                android:onClick="onClick"
+					                android:text="instanciate Materials" />  
+			            
+			        </LinearLayout>
+		        
+			        <LinearLayout
+			            android:id="@+id/group"
+			            android:layout_width="wrap_content"
+			            android:layout_height="wrap_content" >
+			
+					            <Button
+					                android:id="@+id/btnLaunchImport"
+					                android:layout_width="wrap_content"
+					                android:layout_height="wrap_content"
+					                android:layout_gravity="center_horizontal"
+					                android:layout_marginTop="10dp"
+					                android:text="import DB data" />
+					
+					            <Button
+					                android:id="@+id/btnLaunchExport"
+					                android:layout_width="wrap_content"
+					                android:layout_height="wrap_content"
+					                android:layout_gravity="center_horizontal"
+					                android:layout_marginTop="10dp"
+					                android:text="export msg" />
+					            
+					             <Button
+					                android:id="@+id/btnLaunchDBExport"
+					                android:layout_width="wrap_content"
+					                android:layout_height="wrap_content"
+					                android:layout_gravity="center_horizontal"
+					                android:layout_marginTop="10dp"
+					                android:text="export DB data" />
+			             
+			        </LinearLayout>
+			        
+		
+		
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="import progression" />
+
+        <ProgressBar
+            android:id="@+id/pBAsync"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp" />
+		<EditText 
+		    android:id="@+id/toExterneFile"
+		    android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp"
+		    android:hint="write a comment here please"
+		    />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="export progression" />
+
+        <ProgressBar
+            android:id="@+id/pBAsyncToExt"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp" />
+        
+         <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="export DB progression" />
+
+        <ProgressBar
+            android:id="@+id/pBAsyncDBToExt"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_margin="10dp" />
+
+        <ListView
+            android:id="@android:id/list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.52"
+            android:text="test element 1" />
+    </LinearLayout>
+
+</LinearLayout> 

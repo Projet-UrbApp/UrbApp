@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">UrbApp</string>
+    <string name="action_settings">Settings</string>
+    <string name="homeFragment">Home</string>
+    <string name="definitionFragment">Caractérisation des zones</string>
+    <string name="saveFragment">Sauvegarde et synchronisation</string>
+    <string name="zoneFragment">Définition des zones</string>
+    <string name="informationFragment">Informations</string>
+    
+    <string name="syncMatAndTypes">charger les matériaux et Types du serveur</string>
+    <string name="image_newProject">Image : nouveau projet</string>
+    <string name="image_newProject_takePhoto">Image : nouveau projet</string>
+    <string name="image_newProject_photo">Image : nouveau projet</string>
+    <string name="takePicture">Prendre une photo</string>
+    <string name="loadPicture">Charger une photo</string>
+    <string name="image_loadLocalProject">Image : chargement d\'un projet local</string>
+    <string name="loadLocalProject">Charger un projet local</string>
+    <string name="image_loadDistantProject">Image : chargement d\'un projet distant</string>
+    <string name="loadDistantlProject">Charger un projet distant</string>
+    
+    <string name="fragmentName">Name</string>
+    <string name="param">Paramètres</string>
+    <string name="save">Sauvegarder</string>
+
+    <string name="zone_create">Créer</string>
+    <string name="zone_create_dialog">Comment voulez-vous ajouter la zone ?</string>
+    <string name="zone_create_intersect">Découper la zone</string>
+    <string name="zone_create_add">Ajouter la zone directement</string>
+    <string name="zone_delete">Supprimer</string>
+    <string name="zone_edit">Editer</string>
+    
+    <string name="definition_select">Sélectionner</string>
+    <string name="definition_define">Définir</string>
+    <string name="definition_delete">Ré-initialiser</string>
+    <string name="definition_union">Grouper</string>
+    <string name="definition_union_strong">Liaison forte</string>
+    <string name="definition_union_weak">Liaison faible</string>
+    <string name="definition_union_strong_description">Fusionne les zones sélectionnées en une seule géométrie. Cette opération ne peut pas être annulée. Les caractéristiques des zones seront ré-initialisées</string>
+    <string name="definition_union_weak_description">Lie les zones de manière à ce qu\'un changement sur une zone affecte toutes les autres. Les caractéristiques des zones seront conservées tant qu\'elles n\'auront pas été redéfinies.</string>
+    <string name="definition_divide">Dégrouper</string>
+    <string name="definition_recap">Récapitulatif</string>
+    <string name="definition_select_text">Cliquer sur les zones à sélectionner.</string>
+    
+    <string name="info_text_author">Auteur :</string>
+    <string name="info_text_description">Description de l\'image :</string>
+    <string name="info_text_project">Nom du Projet :</string>
+    <string name="info_text_project_hint">Vous pouvez soit entrer un nom de projet pour en créer un nouveau, ou alors lier l\'image a un projet existant parmis ceux ci-dessous.</string>
+    <string name="info_text_adress">Adresse :</string>
+    <string name="info_text_void"></string>
+    <string name="info_edit_author">Auteur *</string>
+    <string name="info_edit_description">Description *</string>
+    <string name="info_edit_project">Projet *</string>
+    <string name="info_edit_adress">Adresse *</string>
+    <string name="info_edit_complement">Complément *</string>
+    <string name="info_button_geo">Géolocalisation</string>
+    
+    <string name="save_textStatus">None</string>
+    <string name="save_buttonSync">Synchroniser</string>
+    <string name="back">Annuler dernière action</string>
+    <string name="cancel">Quitter</string>
+    <string name="help">Aide</string>
+    <string name="validate">Valider</string>
+    <string name="zone_edit_button_delete_point">Supprimer le point</string>
+    <string name="zone_edit_button_release_point">Lâcher le point</string>
+    
+    <string name="type">Type</string>
+    <string name="materials">Matériaux</string>
+    <string name="color">Couleur</string>
+    <string name="not_defined">Pas défini</string>
+    <string name="definition_dialog_title">Choix des caractéristiques des zones sélectionnées</string>
+    <string name="definition_dialog_type">Type de la zone :</string>
+    <string name="definition_dialog_material">Matériau de la zone :</string>
+    <string name="definition_dialog_color">Couleur de la zone :</string>
+    <string name="ok">OK</string>
+    <string name="information_about_frontage">Informations sur cette zone</string>
+    <string name="satellite">satellite</string>
+    <string name="plan">plan</string>
+	<string name ="topology_exception">TopologyException</string>
+    <string name="nullString"></string>
+    
+    <string name="hybrid">hybride</string>
+	<string name="confirm">Confirmer</string>
+	<string name="confirm_photo">Valider le chargement</string>
+	<string name="progress_dialog_title_connecting">Début d\'envoi de l\'image</string>
+	<string name="upload_error_title">Erreur envoi</string>
+	<string name="upload_error_message">Problème de lors de l\envoi</string>
+	<string name="retry">Réessayer</string>
+	<string name="upload_success_title">Envoi réussi</string>
+	<string name="upload_success_message">Réussite de l\'envoi de l\'image</string>
+	<string name="success">OK</string>
+	<string name="dialog_request_nbPoint">Sélectionner le type de la photo :</string>
+	<string name="progress_dialog_title_uploading">progress_dialog_title_uploading</string>
+	<string name="no_back">Rien à annuler</string>
+	<string name="point_deleting_impossible">Impossible de supprimer le point</string>
+	<string name="delete_zone">Supprimer</string>
+	<string name="validation_not_available">Validation impossible, vérifiez le nombre de points ou les intersections</string>
+	
+	<string name="facade">Façade (2 points)</string>
+	<string name="sol">Sol (Plusieurs points)</string>
+</resources>
