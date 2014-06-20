@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * This layout is used in the definition fragment. The sizes will be be defined by the java code.
+ *
+ * @author	COHENDET Sébastien
+ * 			DAVID Nicolas
+ * 			GUILBART Gabriel
+ * 			PALOMINOS Sylvain
+ * 			PARTY Jules
+ * 			RAMBEAU Merwan
+ * 			
+ */
+-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/definition_type_linear_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+    
+    	<Button 
+        	android:id="@+id/definition_button_union_strong"
+        	android:layout_width="200dp"
+        	android:layout_height="wrap_content"
+        	android:layout_marginTop="20dp"
+        	android:text="@string/definition_union_strong"/>
+
+        <TextView
+            android:id="@+id/definition_text_union_strong"
+            android:layout_width="fill_parent"
+            android:layout_height="80dp"
+            android:text="@string/definition_union_strong_description"
+            android:textColor="#000000" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/definition_material_linear_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/definition_type_linear_layout"
+        android:orientation="horizontal"
+        android:paddingBottom="10dp" >
+
+        <Button
+            android:id="@+id/definition_button_union_weak"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+        	android:layout_marginTop="20dp"
+            android:text="@string/definition_union_weak" />
+
+        <TextView
+            android:id="@+id/definition_text_union_weak"
+            android:layout_width="fill_parent"
+            android:layout_height="80dp"
+            android:text="@string/definition_union_weak_description"
+            android:textColor="#000000" />
+
+    </LinearLayout>
+
+</RelativeLayout>

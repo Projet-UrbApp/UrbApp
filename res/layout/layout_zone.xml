@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+/**
+ * This layout is used in the zone fragment. The sizes will be be defined by the java code.
+ *
+ * @author	COHENDET Sébastien
+ * 			DAVID Nicolas
+ * 			GUILBART Gabriel
+ * 			PALOMINOS Sylvain
+ * 			PARTY Jules
+ * 			RAMBEAU Merwan
+ * 
+ */
+ -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical" >
+
+	<RelativeLayout 
+		android:layout_width="match_parent"
+		android:layout_height="85dp"
+		android:id="@+id/zone_button">
+		
+		<Button
+			android:id="@+id/zone_button_back"
+			android:layout_width="130dp"
+			android:layout_height="fill_parent"
+			android:layout_alignParentLeft="true"
+			android:layout_alignParentTop="true"
+			android:text="@string/back"/>
+	
+		<Button
+			android:id="@+id/zone_button_cancel"
+			android:layout_width="130dp"
+			android:layout_height="fill_parent"
+			android:layout_alignParentTop="true"
+			android:layout_toRightOf="@+id/zone_button_back"
+			android:text="@string/cancel" />
+	
+		<Button
+			android:id="@+id/zone_button_validate"
+			android:layout_width="130dp"
+			android:layout_height="fill_parent"
+			android:layout_alignParentTop="true"
+			android:layout_toRightOf="@+id/zone_button_cancel"
+			android:text="@string/validate" />
+		<Button
+			android:id="@+id/zone_button_delete"
+			android:layout_width="130dp"
+			android:layout_height="fill_parent"
+			android:layout_alignParentTop="true"
+			android:layout_toRightOf="@+id/zone_button_validate"
+			android:text="@string/delete_zone" />
+	</RelativeLayout>	
+
+	<RelativeLayout 
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_marginBottom="15dp"
+		android:layout_below="@+id/zone_button">
+		
+		
+		<ImageView
+			android:id="@+id/image_zone"
+			android:layout_width="fill_parent"
+			android:layout_height="fill_parent"
+			android:src="@drawable/image" />
+	</RelativeLayout>
+	
+</RelativeLayout>

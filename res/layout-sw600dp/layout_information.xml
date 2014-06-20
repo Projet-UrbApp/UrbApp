@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * @author	COHENDET Sébastien
+ * 			DAVID Nicolas
+ * 			GUILBART Gabriel
+ * 			PALOMINOS Sylvain
+ * 			PARTY Jules
+ * 			RAMBEAU Merwan
+ * 
+ * information layout
+ * 
+ * This layout is used in the information fragment. The sizes will be be defined by the java code.
+ * 			
+ */
+-->
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal" >
+
+    <RelativeLayout
+        android:layout_width="75dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+            android:id="@+id/info_layout_text">
+
+        <TextView
+            android:id="@+id/info_text_author"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="10dp"
+            android:text="@string/info_text_author" />
+
+        <TextView
+            android:id="@+id/info_text_description"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/info_text_author"
+            android:layout_marginTop="3dp"
+            android:text="@string/info_text_description" />
+
+        <TextView
+            android:id="@+id/info_text_adress"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/info_text_description"
+            android:text="@string/info_text_adress" />
+
+        <TextView
+            android:id="@+id/info_text_void"
+            android:layout_width="wrap_content"
+            android:layout_height="35dp"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/info_text_adress"
+            android:text="@string/info_text_void" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="270dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/info_layout_text"
+        android:id="@+id/info_layout_edit">
+
+        <EditText
+            android:id="@+id/info_edit_author"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:hint="@string/info_edit_author"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/info_edit_description"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/info_edit_author"
+            android:hint="@string/info_edit_description"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/info_edit_adress"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/info_edit_description"
+            android:hint="@string/info_edit_adress"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/info_edit_adressComplement"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@+id/info_edit_adress"
+            android:hint="@string/info_edit_complement"
+            android:inputType="text" />
+
+        <ToggleButton
+            android:id="@+id/info_button_geo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_below="@+id/info_edit_adressComplement"
+            android:text="@string/info_button_geo"
+            android:textOff="Aucune Géolocalisation"
+            android:textOn="Projet Géolocalisé" />
+
+    <Button
+        android:id="@+id/info_button_next"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/info_button_geo"
+        android:text="==>" />
+
+    </RelativeLayout>
+    
+    <RelativeLayout 
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/info_layout_edit"
+        android:id="@+id/info_layout_project">
+
+        <TextView
+            android:id="@+id/info_text_project"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="10dp"
+            android:text="@string/info_text_project" />
+
+        <EditText
+            android:id="@+id/info_edit_project"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/info_text_project"
+            android:hint="@string/info_edit_project"
+            android:inputType="text" />
+        <TextView
+            android:id="@+id/info_text_project_hint"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/info_edit_project"
+            android:layout_marginTop="10dp"
+            android:layout_marginLeft="50dp"
+            android:text="@string/info_text_project_hint" />
+        
+        
+	    <LinearLayout 
+    		android:orientation="vertical"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_below="@+id/info_edit_project"
+	        android:layout_alignParentLeft="true"
+	        android:id="@+id/info_layout_listView">
+    	</LinearLayout>
+        
+    </RelativeLayout>
+
+</RelativeLayout>
