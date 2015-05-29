@@ -5,11 +5,10 @@
     android:layout_height="match_parent"
     tools:context=".MapActivity" >
     
-        <fragment
-                  android:id="@+id/map"
+        <org.osmdroid.views.MapView
+                  android:id="@+id/mapView"
          android:layout_width="match_parent"
-         android:layout_height="match_parent"
-         android:name="com.google.android.gms.maps.MapFragment"/>
+         android:layout_height="match_parent"/>
         <RelativeLayout
          android:orientation="horizontal"
          android:layout_width="fill_parent"

@@ -99,4 +99,5 @@
 	
 	<string name="facade">Façade (2 points)</string>
 	<string name="sol">Sol (Plusieurs points)</string>
+    <string name="location">location</string>
 </resources>

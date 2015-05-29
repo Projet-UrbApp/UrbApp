@@ -26,11 +26,12 @@ import com.example.pillet.urbapp2.utils.MathOperation;
 import com.example.pillet.urbapp2.utils.RowItem;
 import com.example.pillet.urbapp2.utils.Utils;
 
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
+import org.osmdroid.api.IMapController;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.views.MapView;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.bonuspack.overlays.Marker;
+import org.osmdroid.bonuspack.overlays.Marker.OnMarkerClickListener;
 
 /**
  * Selection of the photo in the current project from server
@@ -54,25 +55,11 @@ public class LoadExternalPhotosActivity extends Activity{
 	/**
 	 * The google map object
 	 */
-	private GoogleMap map;
+	private MapView map;
 	/**
 	 * The instance of  for map activity
 	 */
 	 protected GeoActivity displayedMap;
-	/**
-	 * The button for switching to satellite view
-	 */
-	private Button satellite = null;
-
-	/**
-	 * The button for switching to plan view
-	 */
-	private Button plan = null;
-
-	/**
-	 * The button for switching to hybrid view
-	 */
-	private Button hybrid = null;
 
 	/**
 	 * The rows of the custom ListView (with images)
@@ -99,7 +86,9 @@ public class LoadExternalPhotosActivity extends Activity{
 	 * Instantiate the imageDowloader
 	 */
 	private ImageDownloader imageDownloader = new ImageDownloader();
-	
+	private IMapController mapController;
+	OnMarkerClickListener markerClick;
+
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.layout_loadexternalphotos);
@@ -110,49 +99,50 @@ public class LoadExternalPhotosActivity extends Activity{
 
 		project_id = getIntent().getExtras().getLong("SELECTED_PROJECT_ID");
 
-		map = ((MapFragment) getFragmentManager()
-				.findFragmentById(R.id.map)).getMap();
+		map = (MapView) findViewById(R.id.mapView);
+		map.setTileSource(TileSourceFactory.MAPNIK);
+		map.setBuiltInZoomControls(true);
+		map.setMultiTouchControls(true);
+		map.setClickable(true);
+
+		mapController = map.getController();
+		mapController.setZoom(10);
 		
 		displayedMap = new GeoActivity(true, GeoActivity.defaultPos, map);
 
 		project_barycenter = getIntent().getExtras().getString("PROJECT_COORD");
 		GpsGeom barycenter = new GpsGeom();
 		barycenter.setGpsGeomCoord(project_barycenter);
-		displayedMap = new GeoActivity(false, MathOperation.barycenter(ConvertGeom.gpsGeomToLatLng(barycenter)), map);
+		displayedMap = new GeoActivity(false, MathOperation.barycenter(ConvertGeom.gpsGeomToGeoPoint(barycenter)), map);
 
 		/**
 		 * Define the listeners for switch satellite/plan/hybrid
 		 */
-		satellite = (Button)findViewById(R.id.satellite);
-		plan = (Button)findViewById(R.id.plan);
-		hybrid = (Button)findViewById(R.id.hybrid);
 
-		satellite.setOnClickListener(displayedMap.toSatellite);
-		plan.setOnClickListener(displayedMap.toPlan);
-		hybrid.setOnClickListener(displayedMap.toHybrid);
 
 		listePhotos = (ListView) findViewById(R.id.listViewPhotos);
 		refreshListPhoto();
 
 
 		listePhotos.setOnItemClickListener(selectedPhoto);
-		map.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
+		markerClick  = new OnMarkerClickListener() {
 			@Override
-			public void onInfoWindowClick(Marker marker) {
+			public boolean onMarkerClick(Marker marker,MapView map) {
 				
 				for (Photo actualPhoto:Sync.refreshedValuesPhoto) {
-					if ((int)actualPhoto.getPhoto_id() == photosMarkers.get(marker.getId()))
+					if ((int)actualPhoto.getPhoto_id() == photosMarkers.get(marker.getTitle()))
 						MainActivity.photo = actualPhoto;
 				}
 
-				MainActivity.photo.setUrlTemp(Environment.getExternalStorageDirectory()+"/featureapp/"+MainActivity.photo.getPhoto_url());
+				MainActivity.photo.setUrlTemp(Environment.getExternalStorageDirectory() + "/featureapp/" + MainActivity.photo.getPhoto_url());
 				
 				setResult(RESULT_OK);
 				finish();
 
 				Toast.makeText(MainActivity.baseContext, "Chargement de la photo", Toast.LENGTH_SHORT).show();
+				return true;
 			}
-		});
+		};
 	}
 
 	protected void onClose() {      
@@ -204,27 +194,29 @@ public class LoadExternalPhotosActivity extends Activity{
 		for (Photo enCours:refreshedValues){
 			
 			//TODO request for GPSGeom
-			ArrayList<LatLng> photoGPS = null;
+			ArrayList<GeoPoint> photoGPS = null;
 			for(GpsGeom gg : allGpsGeom){
 				if(gg.getGpsGeomsId()==enCours.getGpsGeom_id()){
-					photoGPS = ConvertGeom.gpsGeomToLatLng(gg);
+					photoGPS = ConvertGeom.gpsGeomToGeoPoint(gg);
 				}
 			}
 			//end of fake photoGPS values
 			
-			LatLng GPSCentered = MathOperation.barycenter(photoGPS);
+			GeoPoint GPSCentered = MathOperation.barycenter(photoGPS);
 					
 			Marker marker = displayedMap.addMarkersColored(i, "Cliquez ici pour valider cette photo", GPSCentered);
-			
+			marker.setOnMarkerClickListener(markerClick);
+
 			/**
 			 * Adding the line in the map
 			 */
 			
 			displayedMap.drawPolygon(photoGPS, false);
 
-			photosMarkers.put(marker.getId(), (int) enCours.getPhoto_id());
+			photosMarkers.put(marker.getTitle(), (int) enCours.getPhoto_id());
 			i++;
 		}
+		map.invalidate();
 	}    
 
 	/**
@@ -235,17 +227,14 @@ public class LoadExternalPhotosActivity extends Activity{
 		@Override
 		public void onItemClick(AdapterView<?> arg0, View v, int position,
 				long id) {
-
-
 			List<GpsGeom> allGpsGeom = Sync.allGpsGeom;
-			ArrayList<LatLng> photoGPS = null;
+			ArrayList<GeoPoint> photoGPS = null;
 			for(GpsGeom gg : allGpsGeom){
 				if(gg.getGpsGeomsId()==refreshedValues.get(position).getGpsGeom_id()){
-					photoGPS = ConvertGeom.gpsGeomToLatLng(gg);
+					photoGPS = ConvertGeom.gpsGeomToGeoPoint(gg);
 				}
 			}
-
-			LatLng GPSCentered = MathOperation.barycenter(photoGPS);
+			GeoPoint GPSCentered = MathOperation.barycenter(photoGPS);
 			displayedMap = new GeoActivity(false, GPSCentered, map);
 		}
 	};

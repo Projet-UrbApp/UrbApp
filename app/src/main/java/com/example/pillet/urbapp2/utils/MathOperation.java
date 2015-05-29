@@ -2,7 +2,7 @@ package com.example.pillet.urbapp2.utils;
 
 import java.util.ArrayList;
 
-import com.google.android.gms.maps.model.LatLng;
+import org.osmdroid.util.GeoPoint;
 
 /**
  * Many static methods useful 
@@ -11,16 +11,16 @@ import com.google.android.gms.maps.model.LatLng;
  */
 public class MathOperation {
 
-	public static LatLng barycenter(ArrayList<LatLng> GPSPoints) {
+	public static GeoPoint barycenter(ArrayList<GeoPoint> GPSPoints) {
 		int numberPoint = GPSPoints.size();
 		Double x = Double.valueOf(0);
 		Double y = Double.valueOf(0);
-		for (LatLng GPSinCase:GPSPoints){
-			x += GPSinCase.latitude;
-			y += GPSinCase.longitude;
+		for (GeoPoint GPSinCase:GPSPoints){
+			x += GPSinCase.getLatitude();
+			y += GPSinCase.getLongitude();
 		}
 		
-		LatLng GPSCentered = new LatLng(x/numberPoint,y/numberPoint);
+		GeoPoint GPSCentered = new GeoPoint(x/numberPoint,y/numberPoint);
 		
 		return GPSCentered;
 	}

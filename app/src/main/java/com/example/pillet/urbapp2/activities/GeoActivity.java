@@ -18,6 +18,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -48,18 +49,20 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnMapClickListener;
-import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polygon;
-import com.google.android.gms.maps.model.PolygonOptions;
-//import org.osmdroid.bonuspack.overlays.Marker;
+import org.osmdroid.bonuspack.location.GeocoderNominatim;
+import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
+import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.util.ResourceProxyImpl;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.ItemizedIconOverlay;
+import org.osmdroid.views.overlay.OverlayItem;
+import org.osmdroid.bonuspack.overlays.Marker;
+import org.osmdroid.bonuspack.overlays.Marker.OnMarkerDragListener;
+import org.osmdroid.bonuspack.overlays.Polygon;
+import org.osmdroid.DefaultResourceProxyImpl;
+import org.osmdroid.api.IMapController;
 
 /**
 * Implements the Google Maps in a fragment.
@@ -71,32 +74,18 @@ import com.google.android.gms.maps.model.PolygonOptions;
 */
 public class GeoActivity extends Activity implements GoogleApiClient.ConnectionCallbacks,
 													 GoogleApiClient.OnConnectionFailedListener,
-													 OnClickListener,LocationListener{
+													 View.OnClickListener,
+													 MapEventsReceiver,LocationListener{
 
-	/**
-	* The button for switching to satellite view
-	*/
-	private Button satellite = null;
-	
-	/**
-	 * The button for switching to plan view
-	 */
-	private Button plan = null;
-	
-	/**
-	 * The button for switching to hybrid view
-	 */
-	private Button hybrid = null;
-	
 	/**
 	 * The button for validating the selection
 	 */
 	private Button validate = null;
 	
 	/**
-	 * The google map object
+	 * The openStreetMap map object
 	 */
-	private GoogleMap map = null;
+	private MapView mapView =null;
 	/**
 	 * Contains the GPS position of the user
 	 */
@@ -112,20 +101,17 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 	/**
 	 * France GPS centered
 	 */
-	public static final LatLng defaultPos=new LatLng(46.52863469527167,2.00896484375);
+	public static final GeoPoint defaultPos=new GeoPoint(46.52863469527167,2.00896484375);
 	/**
 	 * For the localisation of tablets
 	 */
 	private Boolean needCurrentPos;
-	
 	/**
 	* Global constants
 	* Define a request code to send to Google Play services
 	* This code is returned in Activity.onActivityResult
 	*/
-	private final static int
-	        CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
-	
+	private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 	/**
 	* for addresses loading
 	*/
@@ -143,7 +129,7 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 	/**
 	* polygone/line options
 	*/
-	public PolygonOptions rectOptions;
+
 	
 	/**
 	 * Defines all the colors for markers
@@ -155,30 +141,27 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 			R.drawable.marker_purple,
 		};
 
+	private IMapController mapController;
+	private ItemizedIconOverlay locationOverlay;
+	private List<OverlayItem> items;
+	private LocationRequest locationRequest;
+	private DefaultResourceProxyImpl resourceProxy;
+
 	@Override
 	public void onLocationChanged(Location location) {
-		if (location != null) {
-			// Getting latitude of the current location
-			double latitude = location.getLatitude();
-
-			// Getting longitude of the current location
-			double longitude = location.getLongitude();
-
-			// Creating a LatLng object for the current location
-			LatLng latLng = new LatLng(latitude, longitude);
-
-			map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-			Toast.makeText(MainActivity.baseContext, "Position ok", Toast.LENGTH_LONG).show();
-		}
-		else {
-			final LocationManager manager = (LocationManager) getSystemService( Context.LOCATION_SERVICE );
-
-			if ( !manager.isProviderEnabled( LocationManager.GPS_PROVIDER ) ) {
-				buildAlertMessageNoGps();
-			}
-		}
+		updateMap(location);
 	}
 
+	private void updateMap(Location location) {
+		if (location != null) {
+			int lat = (int) (location.getLatitude() * 1E6);
+			int lng = (int) (location.getLongitude() * 1E6);
+			GeoPoint gpt = new GeoPoint(lat, lng);
+			mapController.setCenter(gpt);
+			locationOverlay.addItem( new OverlayItem(getString(R.string.location), (getString(R.string.location)), gpt));
+			mapView.invalidate();
+		}
+	}
 	/**
 	* Define a DialogFragment that displays the error dialog
 	* @author Sebastien
@@ -308,46 +291,56 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
     	if (servicesConnected()){
     		
     		needCurrentPos=true;
-
-    		satellite = (Button)findViewById(R.id.satellite);
-    		plan = (Button)findViewById(R.id.plan);
-    		hybrid = (Button)findViewById(R.id.hybrid);
     		validate = (Button)findViewById(R.id.validate);
 
-    		//Listeners on switch button
-    		satellite.setOnClickListener(toSatellite);
-    		plan.setOnClickListener(toPlan);
-    		hybrid.setOnClickListener(toHybrid);
     		validate.setOnClickListener(this);
 
     		//for reverse adresses
     		mActivityIndicator = (ProgressBar) findViewById(R.id.address_progress);
 
     		// Get a handle to the Map Fragment
-    		map = ((MapFragment) getFragmentManager().findFragmentById(R.id.map)).getMap();
-    		geoActivityInit(true, defaultPos, map);
+			resourceProxy = new ResourceProxyImpl(getApplicationContext());
+			items = new ArrayList<>();
+			mapView = (MapView) findViewById(R.id.mapView);
+			mapView.setTileSource(TileSourceFactory.MAPNIK);
+			mapView.setBuiltInZoomControls(true);
+			mapView.setMultiTouchControls(true);
+			mapView.setClickable(true);
 
-    		map.setOnMapClickListener(ajoutPoints);
-    		map.setOnMarkerDragListener(markerDrag);
+			mapController = mapView.getController();
+			mapController.setZoom(10);
+
+			MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this,this);
+
+			locationOverlay = new ItemizedIconOverlay<>(items, new Glistener(), resourceProxy);
+
+			mapView.getOverlays().add(0, mapEventsOverlay);
+			mapView.getOverlays().add(locationOverlay);
+			mapView.invalidate();
+
 			mGoogleApiClient = new GoogleApiClient.Builder(this)
 					.addApi(LocationServices.API)
 					.addConnectionCallbacks(this)
 					.addOnConnectionFailedListener(this)
 					.build();
-    		
+
+			locationRequest = new LocationRequest();
+			locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+
+			geoActivityInit(true, defaultPos, mapView);
+
     		int i=0;
     		for (GpsGeom gps:MainActivity.gpsGeom){
-    			for(LatLng point:ConvertGeom.gpsGeomToLatLng(gps)) {
+    			for(GeoPoint point:ConvertGeom.gpsGeomToGeoPoint(gps)) {
     				if(i<nbPoints){
-    					Marker marker = map.addMarker(new MarkerOptions()
-    					.position(point)
-    					.title("Adresse postale")
-    					.draggable(true));
+    					Marker newMarker = new Marker(mapView);
+						newMarker.setPosition(point);
+						newMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+						newMarker.setIcon(this.getResources().getDrawable(R.drawable.marker_icon));
+						newMarker.setDraggable(true);
+						getAddress(new MarkerPos(newMarker, point));
 
-    					markers.add(marker);
-
-    					MarkerPos markerpos = new MarkerPos(marker, point);
-    					getAddress(markerpos);
+    					markers.add(newMarker);
     				}
     				i++;
     			}
@@ -360,9 +353,9 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
      * @param pos
      * @param map
      */
-    public GeoActivity(Boolean needCurrentPos, LatLng pos, GoogleMap map){
+    public GeoActivity(Boolean needCurrentPos, GeoPoint pos, MapView map){
     	if (servicesConnected()){
-    		this.map = map;
+    		this.mapView = map;
     		this.needCurrentPos = needCurrentPos;
     		geoActivityInit(needCurrentPos, pos, map);
     	}
@@ -381,27 +374,18 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
      * @param pos
      * @param map
      */
-    public void geoActivityInit(Boolean needCurrentPos, LatLng pos, GoogleMap map){
+    public void geoActivityInit(Boolean needCurrentPos, GeoPoint pos, MapView map){
     	if (needCurrentPos) {
     		/*
     		 * Create a new location client, using the enclosing class to
     		 * handle callbacks.
     		 */
-
     		mLocationRequest = new LocationRequest();
-
     		// Connect the client.
     		//TODO check the threat order
     		//CONNECTION TODO
     	}
-
     	//check
-    	map.setMyLocationEnabled(true);
-    	
-    	if (pos == defaultPos)
-    		map.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 6));
-    	else
-    		map.moveCamera(CameraUpdateFactory.newLatLngZoom(pos, 16));
     }
     
     /**
@@ -426,51 +410,10 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
     }
 
     /**
-	* Listener for switching to Satellite map, if click on the button for.
-	*/
-    public OnClickListener toSatellite = new OnClickListener() {
-                
-        @Override
-        public void onClick(View v) {
-
-         // Other supported types include: MAP_TYPE_NORMAL,
-        	// MAP_TYPE_TERRAIN, MAP_TYPE_HYBRID and MAP_TYPE_NONE
-        	map.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-        	Toast.makeText(MainActivity.baseContext, "Passage à la carte Satellite", Toast.LENGTH_SHORT).show();
-                    
-        }
-    };
-    
-    /**
-	* Listener for switching to Plan (normal) map, if click on the button for.
-	*/
-     public OnClickListener toPlan = new OnClickListener() {
-                
-        @Override
-        public void onClick(View v) {
-
-	         map.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-	         Toast.makeText(MainActivity.baseContext, "Passage à la carte Plan", Toast.LENGTH_SHORT).show();
-        }
-    };
-    
-    /**
-	* Listener for switching to hybrid map, if click on the button for.
-	*/
-     public OnClickListener toHybrid = new OnClickListener() {
-                
-        @Override
-        public void onClick(View v) {
-
-	         map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
-	         Toast.makeText(MainActivity.baseContext, "Passage à la carte Hybride", Toast.LENGTH_SHORT).show();
-        }
-    };
-    
-    /**
 	* Listener for validation the selection
 	*/
-    public void onClick(View v) {
+
+    public void onClick (View v) {
     	
     	if ( (NbPointsGeoDialog.selected == 1 && markers.size() < 3) || (NbPointsGeoDialog.selected == 2 && markers.size() < 2) ) {
     		Toast.makeText(getBaseContext(), "Vous n'avez pas renseigné assez de points", Toast.LENGTH_SHORT).show();
@@ -479,12 +422,12 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
     	else if (NbPointsGeoDialog.selected == 1) {
     		
     		try {
-	    		ArrayList<LatLng> ll = new ArrayList<LatLng>();
+	    		ArrayList<GeoPoint> ll = new ArrayList<GeoPoint>();
 	    		for(Marker m : markers){
 	    			ll.add(m.getPosition());
 	    		}
 	    		GpsGeom gg = new GpsGeom();
-	    		gg.setGpsGeomCoord(ConvertGeom.latLngToGpsGeom(ll));
+	    		gg.setGpsGeomCoord(ConvertGeom.GeoPointToGpsGeom(ll));
 	    		gg.setGpsGeomId(GetId.GpsGeom());
 	    		/**
 	    		 * we need to save the address in the photo_adresse attribute
@@ -513,12 +456,12 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
     	else if (NbPointsGeoDialog.selected == 2){
 	    		
 	    	try {
-	    		ArrayList<LatLng> ll = new ArrayList<LatLng>();
+	    		ArrayList<GeoPoint> ll = new ArrayList<GeoPoint>();
 	    		for(Marker m : markers){
 	    			ll.add(m.getPosition());
 	    		}
 	    		GpsGeom gg = new GpsGeom();
-	    		gg.setGpsGeomCoord(ConvertGeom.latLngToGpsGeom(ll));
+	    		gg.setGpsGeomCoord(ConvertGeom.GeoPointToGpsGeom(ll));
 	    		gg.setGpsGeomId(GetId.GpsGeom());
 	    		/**
 	    		 * we need to save the address in the photo_adresse attribute
@@ -548,52 +491,56 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
     /**
 	* Listener for adding points, gps referenced. Make a polyline with it.
 	*/
-    private OnMapClickListener ajoutPoints = new OnMapClickListener(){
-            
-        @SuppressWarnings("null")
-		@Override
-        public void onMapClick(LatLng point) {
-            /**
-             * We prevents to pu more than the max nb of markers
-             */
-            if(NbPointsGeoDialog.selected == 1) {
-            	Marker marker = map.addMarker(new MarkerOptions().position(point).title("Adresse postale").draggable(true));
-       
-	           markers.add(marker);
-	           
-	           MarkerPos markerpos = new MarkerPos(marker, point);
-	           getAddress(markerpos);
-	           
-	           /**
-	            * Drawing on map purpose
-	            */
-	                           
-	           markerToArray(markers);
-            }
-        	
-        	if(NbPointsGeoDialog.selected == 2 && markers.size()<nbPoints) {
 
-                Marker marker = map.addMarker(new MarkerOptions()
-				     .position(point)
-				     .title("Adresse postale")
-				     .draggable(true));
-            
-                markers.add(marker);
-                
-                MarkerPos markerpos = new MarkerPos(marker, point);
-                getAddress(markerpos);
-                
-                /**
-                 * Drawing on map purpose
-                 */
-                                
-                markerToArray(markers);
-            }  
-        	else if(NbPointsGeoDialog.selected == 2 && markers.size() == 2) {
-        		Toast.makeText(getApplicationContext(), "Nombre de points maximum atteint", Toast.LENGTH_SHORT).show();
-        	}
-        }
-    };
+	@Override
+	public boolean singleTapConfirmedHelper(GeoPoint p) {
+		/**
+		 * We prevents to pu more than the max nb of markers
+		 */
+		if(NbPointsGeoDialog.selected == 1) {
+			Marker marker = new Marker(mapView);
+			marker.setPosition(p);
+			marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+			marker.setIcon(this.getResources().getDrawable(R.drawable.marker_icon));
+			marker.setDraggable(true);
+			marker.setPanToView(true);
+			marker.setOnMarkerDragListener(markerDrag);
+			mapView.getOverlays().add(marker);
+			getAddress(new MarkerPos(marker, p));
+			markers.add(marker);
+			/**
+			* Drawing on map purpose
+			*/
+		   markerToArray(markers);
+		}
+		if(NbPointsGeoDialog.selected == 2 && markers.size()<nbPoints) {
+
+			Marker marker = new Marker(mapView);
+			marker.setPosition(p);
+			marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+			marker.setIcon(this.getResources().getDrawable(R.drawable.marker_icon));
+			marker.setDraggable(true);
+			marker.setPanToView(true);
+			marker.setOnMarkerDragListener(markerDrag);
+			getAddress(new MarkerPos(marker, p));
+			mapView.getOverlays().add(marker);
+			markers.add(marker);
+			/**
+			 * Drawing on map purpose
+			 */
+			markerToArray(markers);
+		}
+		else if(NbPointsGeoDialog.selected == 2 && markers.size() == 2) {
+			Toast.makeText(getApplicationContext(), "Nombre de points maximum atteint", Toast.LENGTH_SHORT).show();
+		}
+		return true;
+	}
+
+	@Override
+	public boolean longPressHelper(GeoPoint p)
+	{
+		return false;
+	}
         
     /**
 	* Called by Location Services when the request to connect the
@@ -706,7 +653,7 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 		* Get a Geocoder instance, get the latitude and longitude
 		* look up the address, and return it
 		*
-		* @params params One or more Latlng objects
+		* @params params One or more GeoPoint objects
 		* @return A string containing the address of the current
 		* location, or an empty string if no address can be found,
 		* or an error message
@@ -716,15 +663,15 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
              Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
              // Get the current location from the input parameter list
              MarkerPos markpos = new MarkerPos(params[0]);
-             LatLng loc = markpos.getPosition();
+             GeoPoint loc = markpos.getPosition();
              // Create a list to contain the result address
              List<Address> addresses = null;
              try {
                 /*
 				* Return 1 address.
 				*/
-                 addresses = geocoder.getFromLocation(loc.latitude,
-                         loc.longitude, 1);
+                 addresses = geocoder.getFromLocation(loc.getLatitude(),
+                         loc.getLongitude(), 1);
              } catch (IOException e1) {
              Log.e("LocationSampleActivity","IO Exception in getFromLocation()");
              e1.printStackTrace();
@@ -733,9 +680,9 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
              } catch (IllegalArgumentException e2) {
              // Error message to post in the log
              String errorString = "Illegal arguments " +
-                     Double.toString(loc.latitude) +
+                     Double.toString(loc.getLatitude()) +
                      " , " +
-                     Double.toString(loc.longitude) +
+                     Double.toString(loc.getLongitude())+
                      " passed to address service";
              Log.e("LocationSampleActivity", errorString);
              e2.printStackTrace();
@@ -819,7 +766,7 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
                 
         @Override
         public void onMarkerDragStart(Marker marker) {
-            marker.hideInfoWindow();
+            marker.closeInfoWindow();
         }
         
         @Override
@@ -841,7 +788,7 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
      * @param position of the marker in the map
      * @return the marker itself
      */
-    public Marker addMarkersColored(int number, String title, LatLng position){
+    public Marker addMarkersColored(int number, String title, GeoPoint position){
     	
     	Bitmap.Config conf = Bitmap.Config.ARGB_8888;
     	Bitmap bmp = Bitmap.createBitmap(34, 41, conf);
@@ -867,11 +814,10 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
     	posY = (posY <0) ? 2 : posY;
     	canvas1.drawText(text, posX, posY, color);
     	
-    	Marker marker = map.addMarker(new MarkerOptions()
-    	 .icon(BitmapDescriptorFactory.fromBitmap(bmp))
-         .position(position)
-         .title(title));
-    	
+    	Marker marker = new Marker(mapView);
+    	marker.setIcon(new BitmapDrawable(bmp));// .icon(BitmapDescriptorFactory.fromBitmap(bmp))
+		marker.setPosition(position);
+		marker.setTitle(title);
     	return marker;
     }
     
@@ -880,22 +826,19 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
      * @param points
      * @param refresh for the refresh content or not (yes in that activity)
      */
-    public void drawPolygon(ArrayList<LatLng> points, Boolean refresh){
+    public void drawPolygon(ArrayList<GeoPoint> points, Boolean refresh){
     	if (points.size()>=2) {
     		if (polygon!=null && refresh)
-    			polygon.remove();
-            //Instantiates a new Polygon object and adds points to define a rectangle
-            rectOptions = new PolygonOptions();
-           
-            for (LatLng pt : points) {
-                    rectOptions = rectOptions.add(pt);
-            }
-            // Remove the Polygon if exists
-           if(polygon != null && refresh) {
-                   polygon.remove();
-           }
-            // Get back the mutable Polygon
-            polygon = map.addPolygon(rectOptions);
+				if (polygon!=null && refresh)
+					mapView.getOverlays().remove(polygon);
+			//Instantiates a new Polygon object and adds points to define a rectangle
+
+			polygon = new Polygon(this);
+			polygon.setPoints(points);
+			if(polygon!=null && refresh)
+				mapView.getOverlays().remove(polygon);
+			// Get back the mutable Polygon
+			mapView.getOverlays().add(1,polygon);
        }
     }
     /**
@@ -903,7 +846,7 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
      * @param markers
      */
     public void markerToArray(ArrayList<Marker> markers){
-    	ArrayList<LatLng> points = new ArrayList<LatLng>();
+    	ArrayList<GeoPoint> points = new ArrayList<GeoPoint>();
         for (Marker mark:markers){
         	if(mark!=null){
         		points.add(mark.getPosition());
@@ -911,4 +854,15 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
         }
         drawPolygon(points, true);
     }
+	class Glistener implements ItemizedIconOverlay.OnItemGestureListener<OverlayItem> {
+		@Override
+		public boolean onItemLongPress(int index, OverlayItem item) {
+			return false;
+		}
+
+		@Override
+		public boolean onItemSingleTapUp(int index, OverlayItem item) {
+			return true;
+		}
+	}
 }

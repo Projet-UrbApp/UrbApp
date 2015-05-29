@@ -1,8 +1,7 @@
 package com.example.pillet.urbapp2.utils;
 
-import com.google.android.gms.maps.model.LatLng;
-
-import com.google.android.gms.maps.model.Marker;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.bonuspack.overlays.Marker;
 
 /**
 * Defines a mix of differents objects, needed for the Async method
@@ -22,7 +21,7 @@ public class MarkerPos {
         /**
          * The position of this marker
          */
-        private LatLng position;
+        private GeoPoint position;
         /**
          * Physical Address of the marker
          */
@@ -33,7 +32,7 @@ public class MarkerPos {
          * @param marker
          * @param position
          */
-        public MarkerPos(Marker marker, LatLng position) {
+        public MarkerPos(Marker marker, GeoPoint position) {
                 super();
                 this.marker = marker;
                 this.position = position;
@@ -61,11 +60,11 @@ public class MarkerPos {
                 this.marker = marker;
         }
     	//TODO Adddescription for javadoc
-        public LatLng getPosition() {
+        public GeoPoint getPosition() {
                 return position;
         }
     	//TODO Adddescription for javadoc
-        public void setPosition(LatLng position) {
+        public void setPosition(GeoPoint position) {
                 this.position = position;
         }
 

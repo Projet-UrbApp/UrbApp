@@ -37,8 +37,7 @@
                  android:layout_height="wrap_content"
                  android:text="@string/hybrid"
                  android:layout_toRightOf="@id/plan"/>
-           
-            
+
         </LinearLayout>
 
         <LinearLayout
@@ -52,18 +51,13 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
-       
-        
-        <fragment
-         android:id="@+id/map"
+
+        <org.osmdroid.views.MapView
+         android:id="@+id/mapView"
          android:layout_width="0dp"
          android:layout_weight="1"
-         android:layout_height="match_parent"
-         android:name="com.google.android.gms.maps.MapFragment"/>
+         android:layout_height="match_parent"/>
         </LinearLayout>
-        
-
-        
         
     </LinearLayout>
 

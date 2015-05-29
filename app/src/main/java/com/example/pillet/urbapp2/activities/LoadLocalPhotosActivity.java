@@ -23,11 +23,13 @@ import com.example.pillet.urbapp2.utils.CustomListViewAdapter;
 import com.example.pillet.urbapp2.utils.MathOperation;
 import com.example.pillet.urbapp2.utils.RowItem;
 import com.example.pillet.urbapp2.utils.Utils;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
+
+import org.osmdroid.api.IMapController;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.views.MapView;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.bonuspack.overlays.Marker;
+import org.osmdroid.bonuspack.overlays.Marker.OnMarkerClickListener;
 
 public class LoadLocalPhotosActivity extends Activity{
 
@@ -51,29 +53,15 @@ public class LoadLocalPhotosActivity extends Activity{
 	/**
 	 * The google map object
 	 */
-	private GoogleMap map = null;
+	private MapView map = null;
 	/**
 	 * The instance of GeoActivity for map activity
 	 */
 	GeoActivity displayedMap;
-	/**
-	 * The button for switching to satellite view
-	 */
-	private Button satellite = null;
-
-	/**
-	 * The button for switching to plan view
-	 */
-	private Button plan = null;
-
-	/**
-	 * The button for switching to hybrid view
-	 */
-	private Button hybrid = null;
+	OnMarkerClickListener markerClick;
 
 	//TODO add description for javadoc
 	private ArrayList<RowItem> rowItems;
-
 
 	//TODO add description for javadoc
 	long project_id;
@@ -82,6 +70,8 @@ public class LoadLocalPhotosActivity extends Activity{
 	 * Barycenter in string, from loadLocalPrject
 	 */
 	String project_barycenter;
+
+	private IMapController mapController;
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -95,45 +85,35 @@ public class LoadLocalPhotosActivity extends Activity{
 
 		project_id = getIntent().getExtras().getLong("SELECTED_PROJECT_ID");
 
-		map = ((MapFragment) getFragmentManager()
-				.findFragmentById(R.id.map)).getMap();
+		map = (MapView) findViewById(R.id.mapView);
+		map.setTileSource(TileSourceFactory.MAPNIK);
+		map.setBuiltInZoomControls(true);
+		map.setMultiTouchControls(true);
+		map.setClickable(true);
+
+		mapController = map.getController();
+		mapController.setZoom(10);
 
 		project_barycenter = getIntent().getExtras().getString("PROJECT_COORD");
 		GpsGeom barycenter = new GpsGeom();
 		barycenter.setGpsGeomCoord(project_barycenter);
-		displayedMap = new GeoActivity(false, MathOperation.barycenter(ConvertGeom.gpsGeomToLatLng(barycenter)), map);
-
-		/**
-		 * Define the listeners for switch satellite/plan/hybrid
-		 */
-		satellite = (Button)findViewById(R.id.satellite);
-		plan = (Button)findViewById(R.id.plan);
-		hybrid = (Button)findViewById(R.id.hybrid);
-
-		satellite.setOnClickListener(displayedMap.toSatellite);
-		plan.setOnClickListener(displayedMap.toPlan);
-		hybrid.setOnClickListener(displayedMap.toHybrid);
-
+		displayedMap = new GeoActivity(false, MathOperation.barycenter(ConvertGeom.gpsGeomToGeoPoint(barycenter)), map);
 		listePhotos = (ListView) findViewById(R.id.listViewPhotos);
 		refreshListPhoto();
 
-
 		listePhotos.setOnItemClickListener(selectedPhoto);
-		map.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
+		markerClick = new OnMarkerClickListener() {
 			@Override
-			public void onInfoWindowClick(Marker marker) {
+			public boolean onMarkerClick(Marker marker,MapView map) {
 				Toast.makeText(MainActivity.baseContext, "Chargement de la photo", Toast.LENGTH_SHORT).show();				
 				//TODO Sebastien has to make it more readable
-				MainActivity.datasource.instanciatePhoto(refreshedValues.get(photosMarkers.get(marker.getId())).getPhoto_id());
-				
+				MainActivity.datasource.instanciatePhoto(refreshedValues.get(photosMarkers.get(marker.getTitle())).getPhoto_id());
 				//TODO do a better way to have the path !
-				MainActivity.photo.setUrlTemp(Environment.getExternalStorageDirectory()+"/featureapp/"+refreshedValues.get(photosMarkers.get(marker.getId())).getPhoto_url());
-				
+				MainActivity.photo.setUrlTemp(Environment.getExternalStorageDirectory()+"/featureapp/"+refreshedValues.get(photosMarkers.get(marker.getTitle())).getPhoto_url());
 				setResult(RESULT_OK);
-				finish();
-
+				return true;
 			}
-		});
+		};
 	}
 
 	protected void onClose() {      
@@ -147,14 +127,10 @@ public class LoadLocalPhotosActivity extends Activity{
 	 * @return
 	 */
 	public List<com.example.pillet.urbapp2.db.Photo> recupPhoto() {
-
 		//List<com.example.pillet.urbapp2.db.Photo> values = this.datasource.getAllPhotos();
-
 		//TODO CATCH EXCEPTION
-
 		List<com.example.pillet.urbapp2.db.Photo> values = this.datasource.getAllPhotolinkedtoProject(project_id);
 		return values;
-
 	}
 	
 	/**
@@ -162,65 +138,52 @@ public class LoadLocalPhotosActivity extends Activity{
 	 * @return
 	 */
 	public List<com.example.pillet.urbapp2.db.GpsGeom> recupGpsGeom() {
-
 		//List<com.example.pillet.urbapp2.db.Photo> values = this.datasource.getAllPhotos();
-
 		//TODO CATCH EXCEPTION
-
 		List<com.example.pillet.urbapp2.db.GpsGeom> values = this.datasource.getAllGpsGeom();
 		return values;
-
 	}
 
 	/**
 	 * creating a list of project and loads in the view
 	 */
-	public void refreshListPhoto(){      
-
+	public void refreshListPhoto(){
 		refreshedValues = recupPhoto();
 		List<com.example.pillet.urbapp2.db.GpsGeom> allGpsGeom = recupGpsGeom();
-
 		rowItems = new ArrayList<RowItem>();
 		int cajou=0;
 		for (Photo image:refreshedValues) {
-		
 			RowItem item = new RowItem(Environment.getExternalStorageDirectory()+"/featureapp/"+image.getPhoto_url(),"Photo n°"+cajou,image.getPhoto_description());
 			rowItems.add(item);
 			cajou++;
 		}
-
 		CustomListViewAdapter adapter = new CustomListViewAdapter(this,
 				R.layout.layout_photolistview, rowItems);
 		listePhotos.setAdapter(adapter);
-
 		/**
 		 * Put markers on the map
 		 */
 		Integer i = Integer.valueOf(0);
 		for (Photo enCours:refreshedValues){
-			
 			//TODO request for GPSGeom
-			ArrayList<LatLng> photoGPS = null;
+			ArrayList<GeoPoint> photoGPS = null;
 			for(GpsGeom gg : allGpsGeom){
 				if(gg.getGpsGeomsId()==enCours.getGpsGeom_id()){
-					photoGPS = ConvertGeom.gpsGeomToLatLng(gg);
+					photoGPS = ConvertGeom.gpsGeomToGeoPoint(gg);
 				}
 			}
 			//end of fake photoGPS values
-			
-			LatLng GPSCentered = MathOperation.barycenter(photoGPS);
-					
+			GeoPoint GPSCentered = MathOperation.barycenter(photoGPS);
 			Marker marker = displayedMap.addMarkersColored(i, "Cliquez ici pour valider cette photo", GPSCentered);
-			
+			marker.setOnMarkerClickListener(markerClick);
 			/**
 			 * Adding the line in the map
 			 */
-			
 			displayedMap.drawPolygon(photoGPS, false);
-
-			photosMarkers.put(marker.getId(), i);
+			photosMarkers.put(marker.getTitle(), i);
 			i++;
 		}
+		map.invalidate();
 	}    
 
 	/**
@@ -231,16 +194,14 @@ public class LoadLocalPhotosActivity extends Activity{
 		@Override
 		public void onItemClick(AdapterView<?> arg0, View v, int position,
 				long id) {
-
 			List<com.example.pillet.urbapp2.db.GpsGeom> allGpsGeom = recupGpsGeom();
-			ArrayList<LatLng> photoGPS = null;
+			ArrayList<GeoPoint> photoGPS = null;
 			for(GpsGeom gg : allGpsGeom){
 				if(gg.getGpsGeomsId()==refreshedValues.get(position).getGpsGeom_id()){
-					photoGPS = ConvertGeom.gpsGeomToLatLng(gg);
+					photoGPS = ConvertGeom.gpsGeomToGeoPoint(gg);
 				}
 			}
-
-			LatLng GPSCentered = MathOperation.barycenter(photoGPS);
+			GeoPoint GPSCentered = MathOperation.barycenter(photoGPS);
 			displayedMap = new GeoActivity(false, GPSCentered, map);
 		}
 	};

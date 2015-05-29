@@ -21,11 +21,14 @@ import com.example.pillet.urbapp2.db.LocalDataSource;
 import com.example.pillet.urbapp2.db.Project;
 import com.example.pillet.urbapp2.utils.ConvertGeom;
 import com.example.pillet.urbapp2.utils.MathOperation;
-import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.GoogleMap.OnInfoWindowClickListener;
-import com.google.android.gms.maps.MapFragment;
-import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
+
+import org.osmdroid.api.IMapController;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.views.MapView;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.bonuspack.overlays.Marker;
+import org.osmdroid.bonuspack.overlays.Marker.OnMarkerClickListener;
+
 
 public class LoadLocalProjectsActivity extends Activity {
 
@@ -54,72 +57,54 @@ public class LoadLocalProjectsActivity extends Activity {
     /**
      * The google map object
      */
-    private GoogleMap map = null;
+    private MapView map = null;
     /**
      * The instance of GeoActivity for map activity
      */
     private GeoActivity displayedMap;
-    /**
-     * The button for switching to satellite view
-     */
-    private Button satellite = null;
-    
-    /**
-     * The button for switching to plan view
-     */
-    private Button plan = null;
-    
-    /**
-     * The button for switching to hybrid view
-     */
-    private Button hybrid = null;
-    
+    OnMarkerClickListener markerClick;
+    private IMapController mapController;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_loadlocaldb);
         datasource=MainActivity.datasource;
         datasource.open();
-        
-        map = ((MapFragment) getFragmentManager()
-                .findFragmentById(R.id.map)).getMap();
+
+        map = (MapView) findViewById(R.id.mapView);
+        map.setTileSource(TileSourceFactory.MAPNIK);
+        map.setBuiltInZoomControls(true);
+        map.setMultiTouchControls(true);
+        map.setClickable(true);
+
+        mapController = map.getController();
+        mapController.setZoom(10);
         
         displayedMap = new GeoActivity(true, GeoActivity.defaultPos, map);
-        
-        /**
-         * Define the listeners for switch satellite/plan/hybrid
-         */
-        satellite = (Button)findViewById(R.id.satellite);
-        plan = (Button)findViewById(R.id.plan);
-        hybrid = (Button)findViewById(R.id.hybrid);
-        
-        satellite.setOnClickListener(displayedMap.toSatellite);
-        plan.setOnClickListener(displayedMap.toPlan);
-        hybrid.setOnClickListener(displayedMap.toHybrid);
         
         listeProjects = (ListView) findViewById(R.id.listView);
         refreshList();
         
         listeProjects.setOnItemClickListener(selectedProject);
-        map.setOnInfoWindowClickListener(new OnInfoWindowClickListener() {
+        markerClick =new OnMarkerClickListener() {
             @Override
-            public void onInfoWindowClick(Marker marker) {
-               Toast.makeText(MainActivity.baseContext, refreshedValues.get(projectMarkers.get(marker.getId())).toString(), Toast.LENGTH_LONG).show();
-   				Intent i = new Intent(getApplicationContext(), LoadLocalPhotosActivity.class);
-   				i.putExtra("SELECTED_PROJECT_ID", refreshedValues.get(projectMarkers.get(marker.getId())).getProjectId());
-   				
-   				ArrayList<LatLng> coordProjet = new ArrayList<LatLng>();
+            public boolean onMarkerClick(Marker marker,MapView map) {
+                Toast.makeText(MainActivity.baseContext, refreshedValues.get(projectMarkers.get(marker.getTitle())).toString(), Toast.LENGTH_LONG).show();
+                Intent i = new Intent(getApplicationContext(), LoadLocalPhotosActivity.class);
+                i.putExtra("SELECTED_PROJECT_ID", refreshedValues.get(projectMarkers.get(marker.getTitle())).getProjectId());
 
-   					for(GpsGeom gg : allGpsGeom){
-   		        		if(refreshedValues.get(projectMarkers.get(marker.getId())).getGpsGeom_id()==gg.getGpsGeomsId()){
-   		        			coordProjet.addAll(ConvertGeom.gpsGeomToLatLng(gg));
-   		        		}
-   					}
-   				i.putExtra("PROJECT_COORD", ConvertGeom.latLngToGpsGeom(coordProjet));
-   				startActivityForResult(i, 1);
-   				
+                ArrayList<GeoPoint> coordProjet = new ArrayList<GeoPoint>();
+
+                for (GpsGeom gg : allGpsGeom) {
+                    if (refreshedValues.get(projectMarkers.get(marker.getTitle())).getGpsGeom_id() == gg.getGpsGeomsId()) {
+                        coordProjet.addAll(ConvertGeom.gpsGeomToGeoPoint(gg));
+                    }
+                }
+                i.putExtra("PROJECT_COORD", ConvertGeom.GeoPointToGpsGeom(coordProjet));
+                startActivityForResult(i, 1);
+                return true;
             }
-        });
+        };
     }
     
     protected void onClose() {      
@@ -168,19 +153,20 @@ public class LoadLocalProjectsActivity extends Activity {
          */
         Integer i = Integer.valueOf(0);
         for (Project enCours:refreshedValues){
-			LatLng coordProjet = null;
+			GeoPoint coordProjet = null;
         	for(GpsGeom gg : allGpsGeom){
         		if(enCours.getGpsGeom_id()==gg.getGpsGeomsId()){
-        			coordProjet =  MathOperation.barycenter(ConvertGeom.gpsGeomToLatLng(gg));
+        			coordProjet =  MathOperation.barycenter(ConvertGeom.gpsGeomToGeoPoint(gg));
         		}
         	}
         	
         	Marker marker = displayedMap.addMarkersColored(i, "Cliquez ici pour charger le projet", coordProjet);
-            
-        	projectMarkers.put(marker.getId(), i);
+            marker.setOnMarkerClickListener(markerClick);
+        	projectMarkers.put(marker.getTitle(), i);
         	toList.add(i+" - "+enCours.getProjectName());
         	i++;
         }
+        map.invalidate();
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, toList);
         listeProjects.setAdapter(adapter);
    }
@@ -193,11 +179,11 @@ public class LoadLocalProjectsActivity extends Activity {
     {
 		@Override
 		public void onItemClick(AdapterView<?> arg0, View v, int position, long id) {
-			LatLng coordProjet = null;
+			GeoPoint coordProjet = null;
         	List<GpsGeom> allGpsGeom = recupGpsGeom();
         	for(GpsGeom gg : allGpsGeom){
         		if(refreshedValues.get(position).getGpsGeom_id()==gg.getGpsGeomsId()){
-        			coordProjet =  MathOperation.barycenter(ConvertGeom.gpsGeomToLatLng(gg));
+        			coordProjet =  MathOperation.barycenter(ConvertGeom.gpsGeomToGeoPoint(gg));
         		}
         	}
 
