@@ -22,13 +22,11 @@ import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -141,27 +139,17 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 			R.drawable.marker_purple,
 		};
 
+	/**
+	 * Defines the interface that control the map (essentially zoom buttons)
+	 */
 	private IMapController mapController;
+	/**
+	 * Overlay used to display location of the user on the map
+	 */
 	private ItemizedIconOverlay locationOverlay;
-	private List<OverlayItem> items;
-	private LocationRequest locationRequest;
-	private DefaultResourceProxyImpl resourceProxy;
 
-	@Override
-	public void onLocationChanged(Location location) {
-		updateMap(location);
-	}
-
-	private void updateMap(Location location) {
-		if (location != null) {
-			int lat = (int) (location.getLatitude() * 1E6);
-			int lng = (int) (location.getLongitude() * 1E6);
-			GeoPoint gpt = new GeoPoint(lat, lng);
-			mapController.setCenter(gpt);
-			locationOverlay.addItem( new OverlayItem(getString(R.string.location), (getString(R.string.location)), gpt));
-			mapView.invalidate();
-		}
-	}
+	/*----------------------------------------------------------------------------*/
+    //Dialogs used in this activity
 	/**
 	* Define a DialogFragment that displays the error dialog
 	* @author Sebastien
@@ -170,7 +158,6 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 	public static class ErrorDialogFragment extends DialogFragment {
 	    // Global field to contain the error dialog
 	    private Dialog mDialog;
-	    
 	    // 
 	    /**
 	     * Default constructor. Sets the dialog field to null. For displaying all the issue with Google Play Service
@@ -179,7 +166,6 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 	        super();
 	        mDialog = null;
 	    }
-	    
 	    /**
 	     * Set the dialog to display
 	     * @param dialog
@@ -193,7 +179,6 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 	        return mDialog;
 	    }
 	}
-    
     /**
 	* Show a dialog returned by Google Play services for the
 	* connection error code
@@ -201,50 +186,21 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 	* @param errorCode An error code returned from onConnectionFailed
 	*/
     private void showErrorDialog(int errorCode) {
-
         // Get the error dialog from Google Play services
         Dialog errorDialog = GooglePlayServicesUtil.getErrorDialog(
-            errorCode,
-            this,
-            CONNECTION_FAILURE_RESOLUTION_REQUEST);
-
+				errorCode,
+				this,
+				CONNECTION_FAILURE_RESOLUTION_REQUEST);
         // If Google Play services can provide an error dialog
         if (errorDialog != null) {
-
             // Create a new DialogFragment in which to show the error dialog
             ErrorDialogFragment errorFragment = new ErrorDialogFragment();
-
             // Set the dialog in the DialogFragment
             errorFragment.setDialog(errorDialog);
-
             // Show the error dialog in the DialogFragment
             errorFragment.show(getFragmentManager(), "Localisation");
         }
     }
-
-    /**
-	* Handle results returned to the FragmentActivity
-	* by Google Play services
-	*/
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        // Decide what to do based on the original request code
-        switch (requestCode) {
-            case CONNECTION_FAILURE_RESOLUTION_REQUEST :
-            /*
-			* If the result code is Activity.RESULT_OK, try
-			* to connect again
-			*/
-                switch (resultCode) {
-                    case Activity.RESULT_OK :
-                    /*
-					* Try the request again
-					*/
-                    break;
-                }
-        }
-     }
-
     /**
 	* To check if Google Play Services is installed and up to date ! Propose to update if needed
 	* @return boolean if is really connected
@@ -266,7 +222,6 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
                     resultCode,
                     this,
                     CONNECTION_FAILURE_RESOLUTION_REQUEST);
-
             // If Google Play services can provide an error dialog
             if (errorDialog != null) {
                 // Create a new DialogFragment for the error dialog
@@ -279,7 +234,29 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
         }
                 return false;
     }
-
+	/**
+	 * Displays a message if user has disabled GPS. Invite to put it on (shortcut to settings)
+	 */
+	private void buildAlertMessageNoGps() {
+		final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage("Votre GPS semble désactivé, souhaitez-vous l'activer ?")
+				.setCancelable(false)
+				.setPositiveButton("Oui", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick( final DialogInterface dialog, final int id) {
+						startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+					}
+				})
+				.setNegativeButton("Non", new DialogInterface.OnClickListener() {
+					@Override
+					public void onClick(final DialogInterface dialog, final int id) {
+						dialog.cancel();
+					}
+				});
+		final AlertDialog alert = builder.create();
+		alert.show();
+	}
+	/*-------------------------------------------------------------------------------------*/
     /**
      * For intern implementation
      */
@@ -299,8 +276,8 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
     		mActivityIndicator = (ProgressBar) findViewById(R.id.address_progress);
 
     		// Get a handle to the Map Fragment
-			resourceProxy = new ResourceProxyImpl(getApplicationContext());
-			items = new ArrayList<>();
+			DefaultResourceProxyImpl resourceProxy = new ResourceProxyImpl(getApplicationContext());
+			List<OverlayItem> items = new ArrayList<>();
 			mapView = (MapView) findViewById(R.id.mapView);
 			mapView.setTileSource(TileSourceFactory.MAPNIK);
 			mapView.setBuiltInZoomControls(true);
@@ -324,7 +301,7 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 					.addOnConnectionFailedListener(this)
 					.build();
 
-			locationRequest = new LocationRequest();
+			LocationRequest locationRequest = new LocationRequest();
 			locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
 			geoActivityInit(true, defaultPos, mapView);
@@ -336,7 +313,7 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
     					Marker newMarker = new Marker(mapView);
 						newMarker.setPosition(point);
 						newMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-						newMarker.setIcon(this.getResources().getDrawable(R.drawable.marker_icon));
+						newMarker.setIcon(this.getResources().getDrawable(R.drawable.marker_icon,null));
 						newMarker.setDraggable(true);
 						getAddress(new MarkerPos(newMarker, point));
 
@@ -345,8 +322,32 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
     				i++;
     			}
     		}
-    	}}
-
+    	}
+	}
+	/**
+	 * Handle results returned to the FragmentActivity
+	 * by Google Play services
+	 */
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// Decide what to do based on the original request code
+		switch (requestCode) {
+			case CONNECTION_FAILURE_RESOLUTION_REQUEST :
+            /*
+			* If the result code is Activity.RESULT_OK, try
+			* to connect again
+			*/
+				switch (resultCode) {
+					case Activity.RESULT_OK :
+				/*
+				* Try the request again
+				*/
+						break;
+				}
+		}
+	}
+	/*-------------------------------------------------------------------------------*/
+	// Constructors and initiator of geoActivity
     /**
      * Constructor of GeoActivity (needed in case of extern implementation)
      * @param needCurrentPos
@@ -369,7 +370,7 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
     }
     
     /**
-     * 
+     * Initiate the geoActivity
      * @param needCurrentPos
      * @param pos
      * @param map
@@ -387,32 +388,10 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
     	}
     	//check
     }
-    
-    /**
-     * Called when the activity is started.
-     */
-    @Override
-	protected void onStart() {
-        super.onStart();
-        mGoogleApiClient.connect();
-    }
-   
-    /**
-	* Called when the Activity is no longer visible.
-	*/
-    @Override
-    protected void onStop() {
-        if (needCurrentPos) {
-        	// Disconnecting the client invalidates it.
-        	mGoogleApiClient.disconnect();
-        }
-        super.onStop();
-    }
-
+	/*-----------------------------------------------------------------------------------*/
     /**
 	* Listener for validation the selection
 	*/
-
     public void onClick (View v) {
     	
     	if ( (NbPointsGeoDialog.selected == 1 && markers.size() < 3) || (NbPointsGeoDialog.selected == 2 && markers.size() < 2) ) {
@@ -487,21 +466,22 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 	    	finish();
     	}
     }
-        
+	/*-------------------------------------------------------------------------*/
+    // Map event listener implementation
     /**
 	* Listener for adding points, gps referenced. Make a polyline with it.
 	*/
-
 	@Override
 	public boolean singleTapConfirmedHelper(GeoPoint p) {
 		/**
 		 * We prevents to pu more than the max nb of markers
 		 */
 		if(NbPointsGeoDialog.selected == 1) {
+			// seting up the added marker
 			Marker marker = new Marker(mapView);
 			marker.setPosition(p);
 			marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-			marker.setIcon(this.getResources().getDrawable(R.drawable.marker_icon));
+			marker.setIcon(this.getResources().getDrawable(R.drawable.marker_icon,null));
 			marker.setDraggable(true);
 			marker.setPanToView(true);
 			marker.setOnMarkerDragListener(markerDrag);
@@ -514,11 +494,11 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 		   markerToArray(markers);
 		}
 		if(NbPointsGeoDialog.selected == 2 && markers.size()<nbPoints) {
-
+			// setting up the added marker
 			Marker marker = new Marker(mapView);
 			marker.setPosition(p);
 			marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-			marker.setIcon(this.getResources().getDrawable(R.drawable.marker_icon));
+			marker.setIcon(this.getResources().getDrawable(R.drawable.marker_icon,null));
 			marker.setDraggable(true);
 			marker.setPanToView(true);
 			marker.setOnMarkerDragListener(markerDrag);
@@ -536,26 +516,66 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 		return true;
 	}
 
+	/**
+	 * Long press event is not consumed and can't be handled by other objects
+	 * @param p
+	 * @return event consumption
+	 */
 	@Override
 	public boolean longPressHelper(GeoPoint p)
 	{
 		return false;
 	}
-        
+	/*----------------------------------------------------------------------*/
+	//connection to location services methods
+	/**
+	 * Called when the activity is started.
+	 */
+	@Override
+	protected void onStart() {
+		super.onStart();
+		mGoogleApiClient.connect();
+	}
+
+	/**
+	 * Called when the Activity is no longer visible.
+	 */
+	@Override
+	protected void onStop() {
+		if (needCurrentPos) {
+			// Disconnecting the client invalidates it.
+			mGoogleApiClient.disconnect();
+		}
+		super.onStop();
+	}
+
+	/**
+	 * Called when location has changed to do an update of the displayed map
+	 * @param location
+	 */
+	@Override
+	public void onLocationChanged(Location location) {
+		if (location != null) {
+			int lat = (int) (location.getLatitude() * 1E6);
+			int lng = (int) (location.getLongitude() * 1E6);
+			GeoPoint gpt = new GeoPoint(lat, lng);
+			mapController.setCenter(gpt);
+			locationOverlay.addItem( new OverlayItem(getString(R.string.location), (getString(R.string.location)), gpt));
+			mapView.invalidate();
+		}
+	}
+
     /**
 	* Called by Location Services when the request to connect the
 	* client finishes successfully. At this point, you can
 	* request the current location or start periodic updates
 	*/
-        
     @Override
     public void onConnected(Bundle dataBundle) {
 		mLocationRequest = LocationRequest.create();
 		mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 		//mLocationRequest.setInterval(10000); //actualize position every 10 second
-
-		LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient,mLocationRequest,this);
-
+		LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
     }
 
 	@Override
@@ -564,74 +584,49 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 	}
 
 	/**
-	* Displays a message if user has disabled GPS. Invite to put it on (shortcut to settings)
-	*/
-    private void buildAlertMessageNoGps() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Votre GPS semble désactivé, souhaitez-vous l'activer ?")
-               .setCancelable(false)
-               .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick( final DialogInterface dialog, final int id) {
-                       startActivity(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS));
-                   }
-               })
-               .setNegativeButton("Non", new DialogInterface.OnClickListener() {
-                   @Override
-                   public void onClick(final DialogInterface dialog, final int id) {
-                	   dialog.cancel();
-                   }
-               });
-        final AlertDialog alert = builder.create();
-        alert.show();
-    }
+	 * Called by Location Services if the connection to the
+	 * location client drops because of an error.
+	 */
+	public void onDisconnected() {
+		// Display the connection status
+		Toast.makeText(this, "Disconnected. Please re-connect.",Toast.LENGTH_SHORT).show();
+	}
 
-    /**
-	* Called by Location Services if the connection to the
-	* location client drops because of an error.
-	*/
-
-    public void onDisconnected() {
-        // Display the connection status
-        Toast.makeText(this, "Disconnected. Please re-connect.",Toast.LENGTH_SHORT).show();
-    }
-
-    /**
-	* Called by Location Services if the attempt to
-	* Location Services fails.
-	*/
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
+	/**
+	 * Called by Location Services if the attempt to
+	 * Location Services fails.
+	 */
+	@Override
+	public void onConnectionFailed(ConnectionResult connectionResult) {
         /*
 		* Google Play services can resolve some errors it detects.
 		* If the error has a resolution, try sending an Intent to
 		* start a Google Play services activity that can resolve
 		* error.
 		*/
-        if (connectionResult.hasResolution()) {
-            try {
-                // Start an Activity that tries to resolve the error
-                connectionResult.startResolutionForResult(
-                        this,
-                        CONNECTION_FAILURE_RESOLUTION_REQUEST);
+		if (connectionResult.hasResolution()) {
+			try {
+				// Start an Activity that tries to resolve the error
+				connectionResult.startResolutionForResult(
+						this,
+						CONNECTION_FAILURE_RESOLUTION_REQUEST);
                 /*
 				* Thrown if Google Play services canceled the original
 				* PendingIntent
 				*/
-            } catch (IntentSender.SendIntentException e) {
-                // Log the error
-                e.printStackTrace();
-            }
-        } else {
+			} catch (IntentSender.SendIntentException e) {
+				// Log the error
+				e.printStackTrace();
+			}
+		} else {
             /*
 			* If no resolution is available, display a dialog to the
 			* user with the error.
 			*/
-            showErrorDialog(connectionResult.getErrorCode());
-        }
-    }
-
-    
+			showErrorDialog(connectionResult.getErrorCode());
+		}
+	}
+	/*-----------------------------------------------------------------------------*/
     //for adresses
     /**
 	* A subclass of AsyncTask that calls getFromLocation() in the
@@ -647,8 +642,6 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
              super();
              mContext = context;
          }
-
-
          /**
 		* Get a Geocoder instance, get the latitude and longitude
 		* look up the address, and return it
@@ -660,7 +653,7 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 		*/
          @Override
          protected MarkerPos doInBackground(MarkerPos... params) {
-             Geocoder geocoder = new Geocoder(mContext, Locale.getDefault());
+             GeocoderNominatim geocoder = new GeocoderNominatim(mContext, Locale.getDefault());
              // Get the current location from the input parameter list
              MarkerPos markpos = new MarkerPos(params[0]);
              GeoPoint loc = markpos.getPosition();
@@ -729,13 +722,12 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 	         // Register the results of the lookup.
 	         markpos.getMarker().setSnippet(markpos.getAdresse());
 	         markpos.getMarker().showInfoWindow();
-        
 	         markerToArray(markers);
          }        
      }
      
     /**
-	*
+	* get hte address from the location of a marker
 	* @param markpos The view object associated with this method,
 	* in this case a Button.
 	*/
@@ -757,18 +749,16 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
              (new GetAddressTask(this)).execute(markpos);
          }
      }
-
-     /**
-* Dragging markers listeners.
-* Force the rerending of address and of the polygone
-*/
-     public OnMarkerDragListener markerDrag = new OnMarkerDragListener() {
-                
+	/*--------------------------------------------------------------------------------*/
+	/**
+	* Dragging markers listeners.
+	* Force the rerending of address and of the polygone
+	*/
+	public OnMarkerDragListener markerDrag = new OnMarkerDragListener() {
         @Override
         public void onMarkerDragStart(Marker marker) {
             marker.closeInfoWindow();
         }
-        
         @Override
         public void onMarkerDragEnd(Marker marker) {
             MarkerPos markpos = new MarkerPos(marker, marker.getPosition());
@@ -779,8 +769,9 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
         public void onMarkerDrag(Marker marker) {
         	markerToArray(markers);
         }
-    };
-
+	};
+	/*----------------------------------------------------------------------*/
+    //add a marker on the displayed map
     /**
      * Method to add a personalized marker, with a color chose automatically and a number in it.
      * @param number to display in the marker 
@@ -789,23 +780,18 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
      * @return the marker itself
      */
     public Marker addMarkersColored(int number, String title, GeoPoint position){
-    	
     	Bitmap.Config conf = Bitmap.Config.ARGB_8888;
     	Bitmap bmp = Bitmap.createBitmap(34, 41, conf);
     	bmp.setDensity(Bitmap.DENSITY_NONE);
     	Canvas canvas1 = new Canvas(bmp);
-
     	// paint defines the text color,
     	// stroke width, size
     	Paint color = new Paint();
-    	
     	String text = String.valueOf(number);
     	int fontSize = 28-6*text.length();
     	fontSize = (fontSize <0) ? 2 : fontSize;
-    	
     	color.setTextSize(fontSize);
     	color.setColor(Color.BLACK);
-
     	//modify canvas
     	canvas1.drawBitmap(BitmapFactory.decodeResource(MainActivity.baseContext.getResources(),markersColor[number%markersColor.length]), 0,0, color);
     	int posX = 14 -3*text.length();
@@ -813,7 +799,6 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
     	int posY = 29-3*text.length();
     	posY = (posY <0) ? 2 : posY;
     	canvas1.drawText(text, posX, posY, color);
-    	
     	Marker marker = new Marker(mapView);
     	marker.setIcon(new BitmapDrawable(bmp));// .icon(BitmapDescriptorFactory.fromBitmap(bmp))
 		marker.setPosition(position);
@@ -832,7 +817,6 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 				if (polygon!=null && refresh)
 					mapView.getOverlays().remove(polygon);
 			//Instantiates a new Polygon object and adds points to define a rectangle
-
 			polygon = new Polygon(this);
 			polygon.setPoints(points);
 			if(polygon!=null && refresh)
@@ -854,12 +838,28 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
         }
         drawPolygon(points, true);
     }
+	/*----------------------------------------------------------------------*/
+	/**
+	 * class that will handle some gesture event to itemizedOverlay like markers
+	 */
 	class Glistener implements ItemizedIconOverlay.OnItemGestureListener<OverlayItem> {
+		/**
+		 * long press event is not consumed
+		 * @param index
+		 * @param item
+		 * @return event consumption
+		 */
 		@Override
 		public boolean onItemLongPress(int index, OverlayItem item) {
 			return false;
 		}
 
+		/**
+		 * single tap event is allowed
+ 		 * @param index
+		 * @param item
+		 * @return event consumption
+		 */
 		@Override
 		public boolean onItemSingleTapUp(int index, OverlayItem item) {
 			return true;
