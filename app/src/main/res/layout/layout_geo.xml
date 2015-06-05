@@ -13,24 +13,7 @@
          android:orientation="horizontal"
          android:layout_width="fill_parent"
          android:layout_height="fill_parent">
-         <Button
-                 android:id="@+id/satellite"
-                 android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 android:text="@string/satellite"/>
-                <Button
-                 android:id="@+id/plan"
-                 android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 android:text="@string/plan"
-                 android:layout_toRightOf="@id/satellite"/>
-                <Button
-                 android:id="@+id/hybrid"
-                 android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 android:text="@string/hybrid"
-                 android:layout_toRightOf="@id/plan"/>
-                
+
          <ProgressBar
                 android:id="@+id/address_progress"
                 android:layout_width="wrap_content"

@@ -19,25 +19,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="External projects" />
-           
-                    <Button
-                 android:id="@+id/satellite"
-                 android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 android:text="@string/satellite"/>
-                <Button
-                 android:id="@+id/plan"
-                 android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 android:text="@string/plan"
-                 android:layout_toRightOf="@id/satellite"/>
-                <Button
-                 android:id="@+id/hybrid"
-                 android:layout_width="wrap_content"
-                 android:layout_height="wrap_content"
-                 android:text="@string/hybrid"
-                 android:layout_toRightOf="@id/plan"/>
-           
             
         </LinearLayout>
 

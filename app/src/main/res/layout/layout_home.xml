@@ -139,9 +139,6 @@
                  android:text="@string/loadDistantlProject"/>
         -->
 
-
-
-
     </RelativeLayout>
         <Button
             android:id="@+id/home_exportButton"
