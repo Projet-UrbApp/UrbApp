@@ -486,14 +486,10 @@ public class Sync
 					while ((line = reader.readLine()) != null) {
 						sb.append(line);
 					}
-				}
-				catch (IOException e) { e.printStackTrace(); }
-				catch (Exception e) { e.printStackTrace(); }
+				} catch (Exception e) { e.printStackTrace(); }
 
 				return sb.toString();
 
-			} catch (ClientProtocolException e) {
-				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			} ;
@@ -533,7 +529,7 @@ public class Sync
 
 		/**
 		 * Ask the server and save project and gpsGeom on the var
-		 * @return
+		 *
 		 */
 		protected Void doInBackground(Void... params) {
 

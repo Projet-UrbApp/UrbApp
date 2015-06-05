@@ -55,29 +55,44 @@ public class MarkerPos {
         public Marker getMarker() {
                 return marker;
         }
-    	//TODO Adddescription for javadoc
+
+        /**
+         *
+         * @param marker
+         */
         public void setMarker(Marker marker) {
                 this.marker = marker;
         }
-    	//TODO Adddescription for javadoc
+
+        /**
+         *
+         * @return
+         */
         public GeoPoint getPosition() {
                 return position;
         }
-    	//TODO Adddescription for javadoc
+
+        /**
+         *
+         * @param position
+         */
         public void setPosition(GeoPoint position) {
                 this.position = position;
         }
 
-    	//TODO Adddescription for javadoc
+        /**
+         *
+         * @return
+         */
         public String getAdresse() {
                 return adresse;
         }
 
-    	//TODO Adddescription for javadoc
+        /**
+         *
+         * @param adresse
+         */
         public void setAdresse(String adresse) {
                 this.adresse = adresse;
         }
-        
-        
-
 }

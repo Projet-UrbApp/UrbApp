@@ -235,12 +235,9 @@ public class HomeFragment extends Fragment implements OnClickListener{
 			transformer.transform(source, result);
 
 
-			} catch (ParserConfigurationException pce) {
+			} catch (ParserConfigurationException | TransformerException pce) {
 				pce.printStackTrace();
-		  	}catch (TransformerException tfe)
-			{
-				tfe.printStackTrace();
-			}
+		  	}
 			Utils.showToast(MainActivity.baseContext, "Fichier créer sous : /storage/sdcard0/Liste_Materiaux.xml", Toast.LENGTH_LONG);
 			MainActivity.datasource.close();
 		}

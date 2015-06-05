@@ -25,7 +25,6 @@ public class GpsGeom extends DataObject{
 	 */
 	private String gpsGeom_address;
 
-	
 	//Getters
 	/**
 	 * getter for gpsGeom_id
@@ -54,7 +53,7 @@ public class GpsGeom extends DataObject{
 	//Setters
 	/**
 	 * setter for gpsGeom_id
-	 * @param gpsGeom_id
+	 * @param id
 	 */
 	public void setGpsGeomId(long id) {
 		this.gpsGeom_id = id;
@@ -165,6 +164,5 @@ public class GpsGeom extends DataObject{
 				}
 			}
 		}
-		
 	}
 }

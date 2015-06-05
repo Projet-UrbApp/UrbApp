@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import android.content.Context;
+import android.util.Log;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
+
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -27,6 +29,7 @@ import com.example.pillet.urbapp2.utils.RowItem;
 import com.example.pillet.urbapp2.utils.Utils;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.overlays.Polygon;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.views.MapView;
 import org.osmdroid.util.GeoPoint;
@@ -39,6 +42,7 @@ import org.osmdroid.bonuspack.overlays.Marker.OnMarkerClickListener;
  *
  */
 public class LoadExternalPhotosActivity extends Activity{
+	private static final String TAG = "externalPhotos";
 	/**
 	 * Contains all the projects attributes
 	 */
@@ -56,6 +60,7 @@ public class LoadExternalPhotosActivity extends Activity{
 	 * The google map object
 	 */
 	private MapView map;
+
 	/**
 	 * The instance of  for map activity
 	 */
@@ -65,7 +70,6 @@ public class LoadExternalPhotosActivity extends Activity{
 	 * The rows of the custom ListView (with images)
 	 */
 	private ArrayList<RowItem> rowItems;
-
 
 	/**
 	 * Contains the project id selected by user in previous activity
@@ -86,8 +90,8 @@ public class LoadExternalPhotosActivity extends Activity{
 	 * Instantiate the imageDowloader
 	 */
 	private ImageDownloader imageDownloader = new ImageDownloader();
-	private IMapController mapController;
-	OnMarkerClickListener markerClick;
+
+	private Polygon polygon;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -96,7 +100,6 @@ public class LoadExternalPhotosActivity extends Activity{
 		/**
 		 * extras that contains the project_id
 		 */
-
 		project_id = getIntent().getExtras().getLong("SELECTED_PROJECT_ID");
 
 		map = (MapView) findViewById(R.id.mapView);
@@ -105,7 +108,7 @@ public class LoadExternalPhotosActivity extends Activity{
 		map.setMultiTouchControls(true);
 		map.setClickable(true);
 
-		mapController = map.getController();
+		IMapController mapController = map.getController();
 		mapController.setZoom(10);
 		
 		displayedMap = new GeoActivity(true, GeoActivity.defaultPos, map);
@@ -118,43 +121,36 @@ public class LoadExternalPhotosActivity extends Activity{
 		/**
 		 * Define the listeners for switch satellite/plan/hybrid
 		 */
-
-
 		listePhotos = (ListView) findViewById(R.id.listViewPhotos);
 		refreshListPhoto();
 
-
 		listePhotos.setOnItemClickListener(selectedPhoto);
-		markerClick  = new OnMarkerClickListener() {
-			@Override
-			public boolean onMarkerClick(Marker marker,MapView map) {
-				
-				for (Photo actualPhoto:Sync.refreshedValuesPhoto) {
-					if ((int)actualPhoto.getPhoto_id() == photosMarkers.get(marker.getTitle()))
-						MainActivity.photo = actualPhoto;
-				}
 
-				MainActivity.photo.setUrlTemp(Environment.getExternalStorageDirectory() + "/featureapp/" + MainActivity.photo.getPhoto_url());
-				
-				setResult(RESULT_OK);
-				finish();
-
-				Toast.makeText(MainActivity.baseContext, "Chargement de la photo", Toast.LENGTH_SHORT).show();
-				return true;
-			}
-		};
 	}
+
+	public OnMarkerClickListener markerClick  = new OnMarkerClickListener() {
+		@Override
+		public boolean onMarkerClick(Marker marker, MapView mapView) {
+			for (Photo actualPhoto:Sync.refreshedValuesPhoto) {
+				if ((int)actualPhoto.getPhoto_id() == photosMarkers.get(marker.getTitle()))
+					MainActivity.photo = actualPhoto;
+			}
+			MainActivity.photo.setUrlTemp(Environment.getExternalStorageDirectory() + "/featureapp/" + MainActivity.photo.getPhoto_url());
+			setResult(RESULT_OK);
+			finish();
+			Toast.makeText(MainActivity.baseContext, "Chargement de la photo", Toast.LENGTH_SHORT).show();
+			return true;
+		}
+	};
 
 	protected void onClose() {      
 		Utils.confirm(getFragmentManager());
 	}
 
-	
 	/**
 	 * creating a list of project and loads in the view
 	 */
-	public void refreshListPhoto(){      
-
+	public void refreshListPhoto(){
 		Sync Synchro = new Sync();
     	if (Synchro.getPhotosFromExt(project_id)){
     		try{
@@ -165,9 +161,7 @@ public class LoadExternalPhotosActivity extends Activity{
     			Log.e("DFHUPLOAD", "Pb de data");
     		}
     	}
-    	
 		rowItems = new ArrayList<RowItem>();
-		
 		synchronized (refreshedValues) {
 			int i=0;
 			for (Photo image:refreshedValues) {
@@ -175,18 +169,13 @@ public class LoadExternalPhotosActivity extends Activity{
 				 * Download each photo and register it on tablet
 				 */
 				String imageStoredUrl = imageDownloader.download(MainActivity.serverURL+"images/", image.getPhoto_url());
-
-				
 				RowItem item = new RowItem(Environment.getExternalStorageDirectory()+"/featureapp/"+image.getPhoto_url(),"Photo n°"+i,image.getPhoto_description());
 				rowItems.add(item);
 				i++;
 			}
 		}
-		
-		CustomListViewAdapter adapter = new CustomListViewAdapter(this,
-				R.layout.layout_photolistview, rowItems);
+		CustomListViewAdapter adapter = new CustomListViewAdapter(this, R.layout.layout_photolistview, rowItems);
 		listePhotos.setAdapter(adapter);
-
 		/**
 		 * Put markers on the map
 		 */
@@ -198,21 +187,26 @@ public class LoadExternalPhotosActivity extends Activity{
 			for(GpsGeom gg : allGpsGeom){
 				if(gg.getGpsGeomsId()==enCours.getGpsGeom_id()){
 					photoGPS = ConvertGeom.gpsGeomToGeoPoint(gg);
+					Log.i(TAG,"geoppoint added");
 				}
 			}
 			//end of fake photoGPS values
-			
 			GeoPoint GPSCentered = MathOperation.barycenter(photoGPS);
-					
-			Marker marker = displayedMap.addMarkersColored(i, "Cliquez ici pour valider cette photo", GPSCentered);
+			Marker marker = new Marker(map);
+			marker.setPosition(GPSCentered);
+			marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+			marker.setIcon(this.getResources().getDrawable(R.drawable.marker_icon));
+			marker.setTitle("Cliquez ici pour charger la photo");
+			marker.setPanToView(true);
 			marker.setOnMarkerClickListener(markerClick);
+			map.getController().setCenter(GPSCentered);
+			map.getController().setZoom(map.getMaxZoomLevel());
+			map.getOverlays().add(marker);
 
 			/**
 			 * Adding the line in the map
 			 */
-			
-			displayedMap.drawPolygon(photoGPS, false);
-
+			drawPolygon(photoGPS, false);
 			photosMarkers.put(marker.getTitle(), (int) enCours.getPhoto_id());
 			i++;
 		}
@@ -227,6 +221,7 @@ public class LoadExternalPhotosActivity extends Activity{
 		@Override
 		public void onItemClick(AdapterView<?> arg0, View v, int position,
 				long id) {
+			Log.i(TAG,"Click on list");
 			List<GpsGeom> allGpsGeom = Sync.allGpsGeom;
 			ArrayList<GeoPoint> photoGPS = null;
 			for(GpsGeom gg : allGpsGeom){
@@ -236,6 +231,26 @@ public class LoadExternalPhotosActivity extends Activity{
 			}
 			GeoPoint GPSCentered = MathOperation.barycenter(photoGPS);
 			displayedMap = new GeoActivity(false, GPSCentered, map);
+			map.invalidate();
 		}
 	};
+
+	/**
+	 * Due to context problem this activity has its on drawPolygon method
+	 * @param points
+	 * @param refresh
+	 */
+	public void drawPolygon(ArrayList<GeoPoint> points, Boolean refresh){
+		if (points.size()>=2) {
+			if (polygon!=null && refresh)
+				map.getOverlays().remove(polygon);
+			//Instantiates a new Polygon object and adds points to define a rectangle
+			polygon = new Polygon(this);
+			polygon.setPoints(points);
+			if(polygon!=null && refresh)
+				map.getOverlays().remove(polygon);
+			// Add polygon as an overlay drawn before the marker
+			map.getOverlays().add(0,polygon);
+		}
+	}
 }

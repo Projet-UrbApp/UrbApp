@@ -50,6 +50,7 @@ import com.google.android.gms.location.LocationServices;
 import org.osmdroid.bonuspack.location.GeocoderNominatim;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
+import org.osmdroid.tileprovider.MapTileProviderBasic;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.util.ResourceProxyImpl;
@@ -74,6 +75,7 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 													 GoogleApiClient.OnConnectionFailedListener,
 													 View.OnClickListener,
 													 MapEventsReceiver,LocationListener{
+	private static final String TAG = "GeoActivity";
 
 	/**
 	 * The button for validating the selection
@@ -87,10 +89,8 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 	/**
 	 * Contains the GPS position of the user
 	 */
-
 	private GoogleApiClient mGoogleApiClient = null;
 	private LocationRequest mLocationRequest = null;
-	
 	/**
 	 * number of markers to display (4 for a zone, 2 for a facade)
 	 */
@@ -124,11 +124,7 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 	* polygone/line option to display the selected area
 	*/
 	public Polygon polygon;
-	/**
-	* polygone/line options
-	*/
 
-	
 	/**
 	 * Defines all the colors for markers
 	 */
@@ -148,6 +144,7 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 	 */
 	private ItemizedIconOverlay locationOverlay;
 
+	List<OverlayItem> items = new ArrayList<>();
 	/*----------------------------------------------------------------------------*/
     //Dialogs used in this activity
 	/**
@@ -277,7 +274,7 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 
     		// Get a handle to the Map Fragment
 			DefaultResourceProxyImpl resourceProxy = new ResourceProxyImpl(getApplicationContext());
-			List<OverlayItem> items = new ArrayList<>();
+
 			mapView = (MapView) findViewById(R.id.mapView);
 			mapView.setTileSource(TileSourceFactory.MAPNIK);
 			mapView.setBuiltInZoomControls(true);
@@ -288,7 +285,6 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 			mapController.setZoom(10);
 
 			MapEventsOverlay mapEventsOverlay = new MapEventsOverlay(this,this);
-
 			locationOverlay = new ItemizedIconOverlay<>(items, new Glistener(), resourceProxy);
 
 			mapView.getOverlays().add(0, mapEventsOverlay);
@@ -313,7 +309,7 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
     					Marker newMarker = new Marker(mapView);
 						newMarker.setPosition(point);
 						newMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-						newMarker.setIcon(this.getResources().getDrawable(R.drawable.marker_icon,null));
+						newMarker.setIcon(this.getResources().getDrawable(R.drawable.marker_icon));
 						newMarker.setDraggable(true);
 						getAddress(new MarkerPos(newMarker, point));
 
@@ -386,6 +382,8 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
     		//TODO check the threat order
     		//CONNECTION TODO
     	}
+		map.getController().setCenter(pos);
+		map.getController().setZoom(7);
     	//check
     }
 	/*-----------------------------------------------------------------------------------*/
@@ -476,12 +474,14 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 		/**
 		 * We prevents to pu more than the max nb of markers
 		 */
+		GeoPoint loc  = (GeoPoint) locationOverlay.getItem(0).getPoint();
+		Log.i(TAG,"lat = "+loc.getLatitude()+" lng = "+loc.getLongitude()+" alt = "+loc.getAltitude());
 		if(NbPointsGeoDialog.selected == 1) {
 			// seting up the added marker
 			Marker marker = new Marker(mapView);
 			marker.setPosition(p);
 			marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-			marker.setIcon(this.getResources().getDrawable(R.drawable.marker_icon,null));
+			marker.setIcon(this.getResources().getDrawable(R.drawable.marker_icon));
 			marker.setDraggable(true);
 			marker.setPanToView(true);
 			marker.setOnMarkerDragListener(markerDrag);
@@ -498,7 +498,7 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 			Marker marker = new Marker(mapView);
 			marker.setPosition(p);
 			marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-			marker.setIcon(this.getResources().getDrawable(R.drawable.marker_icon,null));
+			marker.setIcon(this.getResources().getDrawable(R.drawable.marker_icon));
 			marker.setDraggable(true);
 			marker.setPanToView(true);
 			marker.setOnMarkerDragListener(markerDrag);
@@ -559,6 +559,7 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 			int lat = (int) (location.getLatitude() * 1E6);
 			int lng = (int) (location.getLongitude() * 1E6);
 			GeoPoint gpt = new GeoPoint(lat, lng);
+			items.clear();
 			mapController.setCenter(gpt);
 			locationOverlay.addItem( new OverlayItem(getString(R.string.location), (getString(R.string.location)), gpt));
 			mapView.invalidate();
@@ -779,6 +780,7 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
      * @param position of the marker in the map
      * @return the marker itself
      */
+
     public Marker addMarkersColored(int number, String title, GeoPoint position){
     	Bitmap.Config conf = Bitmap.Config.ARGB_8888;
     	Bitmap bmp = Bitmap.createBitmap(34, 41, conf);
@@ -805,7 +807,6 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 		marker.setTitle(title);
     	return marker;
     }
-    
     /**
      * Draw polygon on the map
      * @param points
@@ -814,19 +815,17 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
     public void drawPolygon(ArrayList<GeoPoint> points, Boolean refresh){
     	if (points.size()>=2) {
     		if (polygon!=null && refresh)
-				if (polygon!=null && refresh)
-					mapView.getOverlays().remove(polygon);
+				mapView.getOverlays().remove(polygon);
 			//Instantiates a new Polygon object and adds points to define a rectangle
 			polygon = new Polygon(this);
 			polygon.setPoints(points);
 			if(polygon!=null && refresh)
 				mapView.getOverlays().remove(polygon);
-			// Get back the mutable Polygon
+			// Add polygon as an overlay drawn before the marker
 			mapView.getOverlays().add(1,polygon);
        }
     }
-    /**
-     * 
+    /** build a polygon from arraylist of markers
      * @param markers
      */
     public void markerToArray(ArrayList<Marker> markers){

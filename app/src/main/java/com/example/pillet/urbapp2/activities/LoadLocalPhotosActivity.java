@@ -3,7 +3,7 @@ package com.example.pillet.urbapp2.activities;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
+import android.util.Log;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Environment;
@@ -25,6 +25,7 @@ import com.example.pillet.urbapp2.utils.RowItem;
 import com.example.pillet.urbapp2.utils.Utils;
 
 import org.osmdroid.api.IMapController;
+import org.osmdroid.bonuspack.overlays.Polygon;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.views.MapView;
 import org.osmdroid.util.GeoPoint;
@@ -32,7 +33,7 @@ import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.bonuspack.overlays.Marker.OnMarkerClickListener;
 
 public class LoadLocalPhotosActivity extends Activity{
-
+	private static final String TAG = "localPhotos";
 	/**
 	 * creating datasource
 	 */
@@ -58,7 +59,7 @@ public class LoadLocalPhotosActivity extends Activity{
 	 * The instance of GeoActivity for map activity
 	 */
 	GeoActivity displayedMap;
-	OnMarkerClickListener markerClick;
+	private Polygon polygon;
 
 	//TODO add description for javadoc
 	private ArrayList<RowItem> rowItems;
@@ -102,20 +103,20 @@ public class LoadLocalPhotosActivity extends Activity{
 		refreshListPhoto();
 
 		listePhotos.setOnItemClickListener(selectedPhoto);
-		markerClick = new OnMarkerClickListener() {
-			@Override
-			public boolean onMarkerClick(Marker marker,MapView map) {
-				Toast.makeText(MainActivity.baseContext, "Chargement de la photo", Toast.LENGTH_SHORT).show();				
-				//TODO Sebastien has to make it more readable
-				MainActivity.datasource.instanciatePhoto(refreshedValues.get(photosMarkers.get(marker.getTitle())).getPhoto_id());
-				//TODO do a better way to have the path !
-				MainActivity.photo.setUrlTemp(Environment.getExternalStorageDirectory()+"/featureapp/"+refreshedValues.get(photosMarkers.get(marker.getTitle())).getPhoto_url());
-				setResult(RESULT_OK);
-				return true;
-			}
-		};
 	}
 
+	public OnMarkerClickListener markerClick = new OnMarkerClickListener() {
+		@Override
+		public boolean onMarkerClick(Marker marker, MapView mapView) {
+			Toast.makeText(MainActivity.baseContext, "Chargement de la photo", Toast.LENGTH_SHORT).show();
+			//TODO Sebastien has to make it more readable
+			MainActivity.datasource.instanciatePhoto(refreshedValues.get(photosMarkers.get(marker.getTitle())).getPhoto_id());
+			//TODO do a better way to have the path !
+			MainActivity.photo.setUrlTemp(Environment.getExternalStorageDirectory()+"/featureapp/"+refreshedValues.get(photosMarkers.get(marker.getTitle())).getPhoto_url());
+			setResult(RESULT_OK);
+			return true;
+		}
+	};
 	protected void onClose() {      
 		datasource.close();
 		Utils.confirm(getFragmentManager());
@@ -132,7 +133,7 @@ public class LoadLocalPhotosActivity extends Activity{
 		List<com.example.pillet.urbapp2.db.Photo> values = this.datasource.getAllPhotolinkedtoProject(project_id);
 		return values;
 	}
-	
+
 	/**
 	 * loading the different projects of the local db
 	 * @return
@@ -174,12 +175,20 @@ public class LoadLocalPhotosActivity extends Activity{
 			}
 			//end of fake photoGPS values
 			GeoPoint GPSCentered = MathOperation.barycenter(photoGPS);
-			Marker marker = displayedMap.addMarkersColored(i, "Cliquez ici pour valider cette photo", GPSCentered);
+			Marker marker = new Marker(map);
+			marker.setPosition(GPSCentered);
+			marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+			marker.setIcon(this.getResources().getDrawable(R.drawable.marker_icon));
+			marker.setTitle("Cliquez ici pour valider la photo");
+			marker.setPanToView(true);
 			marker.setOnMarkerClickListener(markerClick);
+			map.getController().setCenter(GPSCentered);
+			map.getController().setZoom(map.getMaxZoomLevel());
+			map.getOverlays().add(marker);
 			/**
 			 * Adding the line in the map
 			 */
-			displayedMap.drawPolygon(photoGPS, false);
+			drawPolygon(photoGPS, false);
 			photosMarkers.put(marker.getTitle(), i);
 			i++;
 		}
@@ -194,6 +203,7 @@ public class LoadLocalPhotosActivity extends Activity{
 		@Override
 		public void onItemClick(AdapterView<?> arg0, View v, int position,
 				long id) {
+			Log.i(TAG,"Click on list");
 			List<com.example.pillet.urbapp2.db.GpsGeom> allGpsGeom = recupGpsGeom();
 			ArrayList<GeoPoint> photoGPS = null;
 			for(GpsGeom gg : allGpsGeom){
@@ -203,6 +213,26 @@ public class LoadLocalPhotosActivity extends Activity{
 			}
 			GeoPoint GPSCentered = MathOperation.barycenter(photoGPS);
 			displayedMap = new GeoActivity(false, GPSCentered, map);
+			map.invalidate();
 		}
 	};
+
+	/**
+	 * Due to context problem this activity has its on drawPolygon method
+	 * @param points
+	 * @param refresh
+	 */
+	public void drawPolygon(ArrayList<GeoPoint> points, Boolean refresh){
+		if (points.size()>=2) {
+			if (polygon!=null && refresh)
+				map.getOverlays().remove(polygon);
+			//Instantiates a new Polygon object and adds points to define a rectangle
+			polygon = new Polygon(this);
+			polygon.setPoints(points);
+			if(polygon!=null && refresh)
+				map.getOverlays().remove(polygon);
+			// Add polygon as an overlay drawn before the marker
+			map.getOverlays().add(0,polygon);
+		}
+	}
 }

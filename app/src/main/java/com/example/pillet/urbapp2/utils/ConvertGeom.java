@@ -2,9 +2,9 @@ package com.example.pillet.urbapp2.utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import android.graphics.Point;
+import android.util.Log;
 
 import com.example.pillet.urbapp2.db.GpsGeom;
 import com.example.pillet.urbapp2.db.PixelGeom;
@@ -20,7 +20,8 @@ import com.vividsolutions.jts.io.WKTReader;
 public class ConvertGeom{
 
 	private static WKTReader wktr = new WKTReader();
-	
+	private static final String TAG = "ConvertGeom";
+
 	//TODO test every function
 	public static Zone pixelGeomToZone(PixelGeom the_geom){
 			Zone temp = new Zone();
@@ -50,18 +51,18 @@ public class ConvertGeom{
 		ArrayList<GeoPoint> list = new ArrayList<GeoPoint>();
 
 		String s = the_geom.getGpsGeomCord().replace("LINESTRING(", "");
+		Log.i(TAG, the_geom.toString());
 		s = s.replace(")", "");
 		ArrayList<String> tab = new ArrayList<String>(Arrays.asList(s.split(",")));
 		for(String str : tab){
-			//TODO debug
-			list.add(new GeoPoint(Double.parseDouble(str.split(" ")[0]), Double.parseDouble(str.split(" ")[1])));
+			// int is needed for GeoPoint, double is for 1/1E6 degree format
+			list.add(new GeoPoint((int) Double.parseDouble(str.split(" ")[0]), -(int) Double.parseDouble(str.split(" ")[1])));
 		}
 		return list;
 	}
 	
 	public static String GeoPointToGpsGeom(ArrayList<GeoPoint> list){
 		String ret="LINESTRING(";
-		
 		String s="";
 		for(GeoPoint ll : list){
 			s+=ll.getLatitude()+" "+ll.getLongitude();
@@ -70,7 +71,6 @@ public class ConvertGeom{
 			}
 		}
 		ret+=s;
-		
 		ret+=")";
 		return ret;
 	}

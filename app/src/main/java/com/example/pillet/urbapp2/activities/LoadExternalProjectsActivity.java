@@ -4,10 +4,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import android.util.Log;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -37,7 +37,7 @@ import org.osmdroid.bonuspack.overlays.Marker.OnMarkerClickListener;
  *
  */
 public class LoadExternalProjectsActivity extends Activity {
-
+    private static final String TAG = "externalProjects";
 	/**
 	 * creating datasource
 	 */
@@ -67,10 +67,9 @@ public class LoadExternalProjectsActivity extends Activity {
     /**
      * The instance of GeoActivity for map activity
      */
-    private GeoActivity displayedMap;
-    OnMarkerClickListener markerClick;
+    public GeoActivity displayedMap;
+    private int click =0;
 
-    private IMapController mapController;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,12 +79,12 @@ public class LoadExternalProjectsActivity extends Activity {
 
         map = (MapView) findViewById(R.id.mapView);
         map.setTileSource(TileSourceFactory.MAPNIK);
-        map.setBuiltInZoomControls(true);
+        map.setBuiltInZoomControls(false);
         map.setMultiTouchControls(true);
         map.setClickable(true);
 
-        mapController = map.getController();
-        mapController.setZoom(10);
+        IMapController mapController = map.getController();
+        mapController.setZoom(6);
         
         displayedMap = new GeoActivity(true, GeoActivity.defaultPos, map);
         
@@ -93,27 +92,34 @@ public class LoadExternalProjectsActivity extends Activity {
         refreshList();
         
         listeProjects.setOnItemClickListener(selectedProject);
-        markerClick  = new OnMarkerClickListener() {
-            @Override
-            public boolean onMarkerClick(Marker marker,MapView map) {
-               Toast.makeText(MainActivity.baseContext, "Chargement du projet", Toast.LENGTH_SHORT).show();
-   				Intent i = new Intent(getApplicationContext(), LoadExternalPhotosActivity.class);
-   				i.putExtra("SELECTED_PROJECT_ID", refreshedValues.get(projectMarkers.get(marker.getTitle())).getProjectId());
-   				
-   				ArrayList<GeoPoint> coordProjet = new ArrayList<GeoPoint>();
 
-   					for(GpsGeom gg : allGpsGeom){
-   		        		if(refreshedValues.get(projectMarkers.get(marker.getTitle())).getGpsGeom_id()==gg.getGpsGeomsId()){
-   		        			coordProjet.addAll(ConvertGeom.gpsGeomToGeoPoint(gg));
-   		        		}
-   					}
-   				i.putExtra("PROJECT_COORD", ConvertGeom.GeoPointToGpsGeom(coordProjet));
-   				startActivityForResult(i, 1);
-   				return true;
-            }
-        };
     }
-    
+    public OnMarkerClickListener markerClick  = new OnMarkerClickListener() {
+        @Override
+        public boolean onMarkerClick(Marker marker, MapView mapView) {
+            if (click == 0) {
+                Toast.makeText(MainActivity.baseContext, "Appuyer une seconde fois pour charger le projet", Toast.LENGTH_SHORT).show();
+                click=1;
+            } else if (click == 1) {
+
+                Toast.makeText(MainActivity.baseContext, "Chargement du projet", Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(getApplicationContext(), LoadExternalPhotosActivity.class);
+                i.putExtra("SELECTED_PROJECT_ID", refreshedValues.get(projectMarkers.get(marker.getTitle())).getProjectId());
+
+                ArrayList<GeoPoint> coordProjet = new ArrayList<GeoPoint>();
+
+                for (GpsGeom gg : allGpsGeom) {
+                    if (refreshedValues.get(projectMarkers.get(marker.getTitle())).getGpsGeom_id() == gg.getGpsGeomsId()) {
+                        coordProjet.addAll(ConvertGeom.gpsGeomToGeoPoint(gg));
+                    }
+                }
+                i.putExtra("PROJECT_COORD", ConvertGeom.GeoPointToGpsGeom(coordProjet));
+                startActivityForResult(i, 1);
+                click=0;
+            }
+            return true;
+        }
+    };
     protected void onClose() {      
         datasource.close();
     }
@@ -148,12 +154,19 @@ public class LoadExternalProjectsActivity extends Activity {
         		}
         	}
         	
-        	Marker marker = displayedMap.addMarkersColored(i, "Cliquez ici pour charger le projet", coordProjet);
+        	Marker marker = new Marker(map);//displayedMap.addMarkersColored(i, "Cliquez ici pour charger le projet", coordProjet);
+            marker.setPosition(coordProjet);
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            marker.setIcon(this.getResources().getDrawable(R.drawable.marker_icon));
+            marker.setTitle("Cliquez ici pour charger le projet : " + i);
+            marker.setPanToView(true);
             marker.setOnMarkerClickListener(markerClick);
+            map.getOverlays().add(marker);
             projectMarkers.put(marker.getTitle(), i);
         	toList.add(i+" - "+enCours.getProjectName());
         	i++;
         }
+
 		map.invalidate();
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, toList);
         listeProjects.setAdapter(adapter);
@@ -167,13 +180,18 @@ public class LoadExternalProjectsActivity extends Activity {
     {
 		@Override
 		public void onItemClick(AdapterView<?> arg0, View v, int position, long id) {
+            Log.i(TAG,"Click on list");
 			GeoPoint coordProjet = null;
+
         	for(GpsGeom gg : allGpsGeom){
         		if(refreshedValues.get(position).getGpsGeom_id()==gg.getGpsGeomsId()){
-        			coordProjet =  MathOperation.barycenter(ConvertGeom.gpsGeomToGeoPoint(gg));
+        			coordProjet = MathOperation.barycenter(ConvertGeom.gpsGeomToGeoPoint(gg));
         		}
         	}
 			displayedMap = new GeoActivity(false, coordProjet, map);
+            Log.i(TAG,"lat = "+coordProjet.getLatitude()+" lng = "+coordProjet.getLongitude());
+            map.getController().setZoom(map.getMaxZoomLevel());
+            map.invalidate();
 		}};
     
     @Override
