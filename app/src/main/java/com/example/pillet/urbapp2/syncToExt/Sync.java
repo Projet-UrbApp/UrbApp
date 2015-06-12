@@ -101,6 +101,7 @@ public class Sync
 		}
 		catch (Exception e)
 		{
+			e.printStackTrace();
 		}
 
 		return success;

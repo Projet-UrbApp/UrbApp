@@ -50,13 +50,13 @@ public class ConvertGeom{
 	public static ArrayList<GeoPoint> gpsGeomToGeoPoint(GpsGeom the_geom){
 		ArrayList<GeoPoint> list = new ArrayList<GeoPoint>();
 
-		String s = the_geom.getGpsGeomCord().replace("LINESTRING(", "");
+		String s = the_geom.getGpsGeomCoord().replace("srid=2154;LINESTRING(", "");
 		Log.i(TAG, the_geom.toString());
 		s = s.replace(")", "");
 		ArrayList<String> tab = new ArrayList<String>(Arrays.asList(s.split(",")));
 		for(String str : tab){
 			// int is needed for GeoPoint, double is for 1/1E6 degree format
-			list.add(new GeoPoint((int) Double.parseDouble(str.split(" ")[0]), -(int) Double.parseDouble(str.split(" ")[1])));
+			list.add(new GeoPoint((int) Double.parseDouble(str.split(" ")[0]), (int) Double.parseDouble(str.split(" ")[1])));
 		}
 		return list;
 	}
@@ -65,7 +65,7 @@ public class ConvertGeom{
 		String ret="LINESTRING(";
 		String s="";
 		for(GeoPoint ll : list){
-			s+=ll.getLatitude()+" "+ll.getLongitude();
+			s+=ll.getLatitudeE6()+" "+ll.getLongitudeE6();
 			if(list.get(list.size()-1)!=ll){
 				s+=",";
 			}

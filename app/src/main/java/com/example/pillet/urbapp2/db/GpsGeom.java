@@ -38,7 +38,7 @@ public class GpsGeom extends DataObject{
 	 * getter for gpsGeom geom
 	 * @return String gpsGeom_the_geom;
 	 */
-	public String getGpsGeomCord() {
+	public String getGpsGeomCoord() {
 		return gpsGeom_the_geom;
 	}
 	
@@ -64,7 +64,7 @@ public class GpsGeom extends DataObject{
 	 * @param str which will be gpsGeom_the_geom;
 	 */
 	public void setGpsGeomCoord(String str) {
-		this.gpsGeom_the_geom = str;
+		this.gpsGeom_the_geom = "srid=2154;"+str;
 	}
 	
 	/**
