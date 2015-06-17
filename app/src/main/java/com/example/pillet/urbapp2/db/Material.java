@@ -4,7 +4,6 @@ import android.content.ContentValues;
 
 public class Material extends DataObject  {
 
-	
 	//Attributes
 	/**
 	 * long id of material
@@ -26,10 +25,6 @@ public class Material extends DataObject  {
 	 * String value of mass density
 	 */
 	private long material_mass_density;
-	
-
-	
-	
 	
 	//Getters
 	/**
@@ -113,10 +108,6 @@ public class Material extends DataObject  {
 	public void setMaterial_mass_density(long material_mass_density) {
 		this.material_mass_density = material_mass_density;
 	}
-
-	
-	
-	
 	
 	//Override Methods
 	@Override
@@ -127,6 +118,10 @@ public class Material extends DataObject  {
 				+ ", material_mass_density=" + material_mass_density + "]";
 	}
 
+	/**
+	 * Save to local database
+	 * @param datasource is the Localdatasource of which DataObject is a table
+	 */
 	@Override
 	public void saveToLocal(LocalDataSource datasource) {
 		ContentValues values = new ContentValues(); 

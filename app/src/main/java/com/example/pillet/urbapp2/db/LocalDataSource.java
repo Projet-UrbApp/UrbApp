@@ -24,7 +24,6 @@ public class LocalDataSource {
 	 * database attributes which allow to create the database
 	 */
 	private MySQLiteHelper dbHelper;
-
 	
 	//TODO Adddescription for javadoc
 	private String[] allColumnsProject = {MySQLiteHelper.COLUMN_PROJECTID, MySQLiteHelper.COLUMN_PROJECTNAME, MySQLiteHelper.COLUMN_GPSGEOMID};
@@ -206,7 +205,6 @@ public class LocalDataSource {
 		+";"
 		;
 	
-	
 	/**
 	 * query to get photo informations
 	 * 
@@ -230,7 +228,6 @@ public class LocalDataSource {
 			+ MySQLiteHelper.TABLE_PHOTO 
 			+" ORDER BY DESC LIMIT 1 ;"
 		;
-	
 	
 	/**
 	 * query to get information of every photos and theirs geolocalisation knowing a project id
@@ -266,7 +263,6 @@ public class LocalDataSource {
 		return projectsList;
 	}
 
-	
 	/**
 	 * execution of the query GETALLGPSGEOM
 	 * @return gpsGeomList that contains the gpsGeom found
@@ -308,8 +304,6 @@ public class LocalDataSource {
 	}
   
   // PHOTO METHODS
-	
-	
 
 	/**
 	 * call the query to get all photos
@@ -329,8 +323,7 @@ public class LocalDataSource {
 		cursor.close();
 		return photosList;
 	}
-	
-	
+
 	/**
 	 * we want every photos linked to a project knowing its id
 	 * @param project_id 
@@ -350,7 +343,6 @@ public class LocalDataSource {
 		cursor.close();
 		return photosList;
 	}
-	
 
 	/**
 	 * delete a photo
@@ -394,22 +386,22 @@ public class LocalDataSource {
 	 * @return the photo created
 	 */
 	private Photo cursorToPhoto(Cursor cursor) {
-	    Photo p1 = new Photo();
-	    p1.setPhoto_id(cursor.getLong(0));
-	    p1.setPhoto_description(cursor.getString(1));
-	    p1.setPhoto_author(cursor.getString(2)); 
-	    p1.setPhoto_url(cursor.getString(3)); 
-	    p1.setPhoto_adresse(cursor.getString(4)); 
-	    p1.setPhoto_nbrPoints(cursor.getLong(5)); 
-	    p1.setPhoto_derniereModif(cursor.getInt(6)); 
-	    p1.setGpsGeom_id(cursor.getLong(7)); 
-	    //TODO créer 2 fonctions, une pour l'instanciation du projet, une pour la recopie des gpsgeom
-	    try{
-	    	p1.setExt_GpsGeomCoord(cursor.getString(9));
-	    }
-	    catch (Exception e){};
-	    return p1;
-		
+		Photo p1 = new Photo();
+		p1.setPhoto_id(cursor.getLong(0));
+		p1.setPhoto_description(cursor.getString(1));
+		p1.setPhoto_author(cursor.getString(2));
+		p1.setPhoto_url(cursor.getString(3));
+		p1.setPhoto_adresse(cursor.getString(4));
+		p1.setPhoto_nbrPoints(cursor.getLong(5));
+		p1.setPhoto_derniereModif(cursor.getInt(6));
+		p1.setGpsGeom_id(cursor.getLong(7));
+		//TODO créer 2 fonctions, une pour l'instanciation du projet, une pour la recopie des gpsgeom
+		try {
+			p1.setExt_GpsGeomCoord(cursor.getString(9));
+		} catch (Exception e) {
+		}
+		;
+		return p1;
 	}
   
 	/**
@@ -652,8 +644,7 @@ public class LocalDataSource {
 		e.setElementType_name(cursor.getString(1));
 		return e;
 	}
-	
-	
+
 	//METHODS FOR ELMENTS TYPE
 	
 	//Create ellementType in the database
@@ -702,7 +693,6 @@ public class LocalDataSource {
 		}
 		cursor.close();
 		MainActivity.elementType=(ArrayList<ElementType>) elementTypeList;
-
 	}
 	//METHODS FOR MATERIALS
 	
@@ -727,9 +717,6 @@ public class LocalDataSource {
 			long insertId = database.insert(MySQLiteHelper.TABLE_MATERIAL, null, values);
 		}
 	}
-	
-	
-	
 	
 	/**
 	 * sql query that counts the number of element type
@@ -757,7 +744,6 @@ public class LocalDataSource {
 		MainActivity.material=(ArrayList<Material>) materialList;		
 	}
 
-	
 	/**
 	 * get information from datasource.database to public static fields from main activity once a local project is loaded
 	 */
@@ -794,8 +780,7 @@ public class LocalDataSource {
 			cursor.moveToNext();
 		}
 		cursor.close();
-		MainActivity.pixelGeom= pixelGeomList;		
-		
+		MainActivity.pixelGeom= pixelGeomList;
 	}
 	
 	/**
@@ -827,8 +812,7 @@ public class LocalDataSource {
 			cursor.moveToNext();
 		}
 		cursor.close();
-		MainActivity.element= elementList;		
-		
+		MainActivity.element= elementList;
 	}
 	
 	/**
@@ -844,8 +828,7 @@ public class LocalDataSource {
 		+ MySQLiteHelper.TABLE_GPSGEOM
 		+" INNER JOIN " + MySQLiteHelper.TABLE_PHOTO 
 		+" ON " + MySQLiteHelper.TABLE_GPSGEOM + "." + MySQLiteHelper.COLUMN_GPSGEOMID +" = " + MySQLiteHelper.TABLE_PHOTO + "." + MySQLiteHelper.COLUMN_GPSGEOMID
-		+" WHERE " + MySQLiteHelper.TABLE_PHOTO + "." + MySQLiteHelper.COLUMN_PHOTOID+" = " 
-		
+		+" WHERE " + MySQLiteHelper.TABLE_PHOTO + "." + MySQLiteHelper.COLUMN_PHOTOID+" = "
 	;
 
 	/**
@@ -864,8 +847,7 @@ public class LocalDataSource {
 			cursor.moveToNext();
 		}
 		cursor.close();
-		MainActivity.gpsGeom= gpsGeomList;		
-		
+		MainActivity.gpsGeom= gpsGeomList;
 	}
 	
 	/**
@@ -902,13 +884,9 @@ public class LocalDataSource {
 			cursor.moveToNext();
 		}
 		cursor.close();
-		MainActivity.project= projectList;		
-		
+		MainActivity.project= projectList;
 	}
-	
 
-	
-	
 	/**
 	 * get information from datasource.database to public static fields photo in main activity once a local project is loaded
 	 */
@@ -932,9 +910,6 @@ public class LocalDataSource {
 		cursor.moveToFirst();
 		Photo photoLoaded = cursorToPhoto(cursor);
 		cursor.close();
-		MainActivity.photo= photoLoaded;		
-		
+		MainActivity.photo= photoLoaded;
 	}
-	
-
 }

@@ -247,9 +247,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 		public MySQLiteHelper(Context context){
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
 		}
-
-
-		
 		@Override
 		public void onCreate(SQLiteDatabase database) {
 			/**
@@ -264,8 +261,6 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 			database.execSQL(getDatabaseCreate7());
 			database.execSQL(getDatabaseCreate8());
 		}
-
-
 		
 		@Override
 		public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {

@@ -14,8 +14,6 @@ public class Composed extends DataObject{
 	 * attribute that refers to the photo_id that is relatated to the project_id
 	 */
 	private long photo_id;
-
-	
 	
 	//Getters
 	/**
@@ -50,8 +48,6 @@ public class Composed extends DataObject{
 	public void setPhoto_id(long photo_id) {
 		this.photo_id = photo_id;
 	}
-
-	
 	
 	//Override Methods
 	@Override
@@ -60,8 +56,10 @@ public class Composed extends DataObject{
 				+ "]";
 	}
 
-
-
+	/**
+	 * save to local database
+	 * @param datasource is the Localdatasource of which DataObject is a table
+	 */
 	@Override
 	public void saveToLocal(LocalDataSource datasource) {
 		ContentValues values = new ContentValues(); 

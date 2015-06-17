@@ -5,6 +5,8 @@ import java.util.Vector;
 
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
+import android.widget.ViewAnimator;
+import android.support.v4.app.FragmentTransaction;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
@@ -16,6 +18,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.pillet.urbapp2.R;
@@ -251,7 +254,6 @@ public class MainActivity extends Activity {
 		ConnectivityManager con=(ConnectivityManager)getSystemService(Activity.CONNECTIVITY_SERVICE);
 		boolean wifi=con.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnectedOrConnecting();
 		boolean mobile = false;
-
 		try{
 			mobile=con.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnectedOrConnecting();
 		}
@@ -392,6 +394,5 @@ public class MainActivity extends Activity {
 		if(i>0){
 			getActionBar().selectTab(getActionBar().getTabAt(i-1));
 		}
-
 	}
 }

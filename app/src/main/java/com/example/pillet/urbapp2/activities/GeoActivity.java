@@ -50,7 +50,6 @@ import com.google.android.gms.location.LocationServices;
 import org.osmdroid.bonuspack.location.GeocoderNominatim;
 import org.osmdroid.bonuspack.overlays.MapEventsOverlay;
 import org.osmdroid.bonuspack.overlays.MapEventsReceiver;
-import org.osmdroid.tileprovider.MapTileProviderBasic;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.util.ResourceProxyImpl;
@@ -475,7 +474,6 @@ public class GeoActivity extends Activity implements GoogleApiClient.ConnectionC
 		 * We prevents to pu more than the max nb of markers
 		 */
 		GeoPoint loc  = (GeoPoint) locationOverlay.getItem(0).getPoint();
-		Log.i(TAG,"lat = "+loc.getLatitude()+" lng = "+loc.getLongitude()+" alt = "+loc.getAltitude());
 		if(NbPointsGeoDialog.selected == 1) {
 			// seting up the added marker
 			Marker marker = new Marker(mapView);

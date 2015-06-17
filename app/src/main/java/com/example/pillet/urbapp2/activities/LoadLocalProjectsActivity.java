@@ -73,8 +73,7 @@ public class LoadLocalProjectsActivity extends Activity {
         datasource.open();
 
         map = (MapView) findViewById(R.id.mapView);
-        map.setTileSource(TileSourceFactory.CLOUDMADESMALLTILES);
-        map.setBuiltInZoomControls(true);
+        map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
         map.setClickable(true);
 

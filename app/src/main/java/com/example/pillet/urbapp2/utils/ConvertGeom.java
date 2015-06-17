@@ -46,12 +46,17 @@ public class ConvertGeom{
 		zone.actualizePolygon();
 		return zone.getPolygon().toText();
 	}
-	
+
+	/**
+	 * build geopoint array from gpsgeom object
+	 * @param the_geom
+	 * @return
+	 */
 	public static ArrayList<GeoPoint> gpsGeomToGeoPoint(GpsGeom the_geom){
 		ArrayList<GeoPoint> list = new ArrayList<GeoPoint>();
 
 		String s = the_geom.getGpsGeomCoord().replace("srid=2154;LINESTRING(", "");
-		Log.i(TAG, the_geom.toString());
+
 		s = s.replace(")", "");
 		ArrayList<String> tab = new ArrayList<String>(Arrays.asList(s.split(",")));
 		for(String str : tab){
@@ -60,7 +65,12 @@ public class ConvertGeom{
 		}
 		return list;
 	}
-	
+
+	/**
+	 * build a gpsgeom from geopoint array
+	 * @param list
+	 * @return
+	 */
 	public static String GeoPointToGpsGeom(ArrayList<GeoPoint> list){
 		String ret="LINESTRING(";
 		String s="";

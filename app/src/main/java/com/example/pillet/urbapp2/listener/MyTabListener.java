@@ -63,8 +63,7 @@ public class MyTabListener implements TabListener{
         		MainActivity.photo.setPhoto_url(url.split("/")[url.split("/").length-1]);
         	}
         }
-        
-        
+
 		if (f.getClass()==HomeFragment.class && !f.isVisible() || MainActivity.photo.getPhoto_id()!=0){
 			ft.replace(android.R.id.content, f);
 		}

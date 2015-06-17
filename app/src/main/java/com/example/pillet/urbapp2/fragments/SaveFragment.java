@@ -24,7 +24,6 @@ import com.example.pillet.urbapp2.db.PixelGeom;
 import com.example.pillet.urbapp2.db.Project;
 import com.example.pillet.urbapp2.syncToExt.Sync;
 
-
 /**
  * @author	COHENDET Sebastien
  * 			DAVID Nicolas
@@ -39,9 +38,7 @@ import com.example.pillet.urbapp2.syncToExt.Sync;
  * 			
  */
 
-
 public class SaveFragment extends Fragment{
-	
 
 	private Button saveToLocal = null;
 	private Button saveToExt = null;
@@ -51,8 +48,6 @@ public class SaveFragment extends Fragment{
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
-
 	}
 
 	@Override
@@ -64,7 +59,6 @@ public class SaveFragment extends Fragment{
 		
 		return v;
 	}
-	
 	
     private OnClickListener OnClickSaveToLocal = new OnClickListener(){
     	public void onClick(View view){
@@ -91,12 +85,12 @@ public class SaveFragment extends Fragment{
     			 * first we need to put the date in Photo
     			 */
     			MainActivity.photo.setPhoto_derniereModif(Sync.maxId.get("date"));
-    			
-    			/**
-    			 * Sync to server
-    			 */
-    			Sync synchroExt = new Sync();
-        		synchroExt.doSyncToExt(upload_photo);
+
+				/**
+				 * Sync to server
+				 */
+				Sync synchroExt = new Sync();
+				synchroExt.doSyncToExt(upload_photo);
         		
         		/**
         		 * Sync local
@@ -118,7 +112,6 @@ public class SaveFragment extends Fragment{
     			Toast toast = Toast.makeText(context, text, duration);
     			toast.show();
     		}
-    		
     	}
     };
     	

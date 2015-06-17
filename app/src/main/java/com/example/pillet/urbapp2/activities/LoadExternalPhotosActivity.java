@@ -128,6 +128,9 @@ public class LoadExternalPhotosActivity extends Activity{
 
 	}
 
+	/**
+	 * click twice on marker to load photo
+	 */
 	public OnMarkerClickListener markerClick  = new OnMarkerClickListener() {
 		@Override
 		public boolean onMarkerClick(Marker marker, MapView mapView) {
@@ -187,11 +190,11 @@ public class LoadExternalPhotosActivity extends Activity{
 			for(GpsGeom gg : allGpsGeom){
 				if(gg.getGpsGeomsId()==enCours.getGpsGeom_id()){
 					photoGPS = ConvertGeom.gpsGeomToGeoPoint(gg);
-					Log.i(TAG,"geoppoint added");
 				}
 			}
 			//end of fake photoGPS values
 			GeoPoint GPSCentered = MathOperation.barycenter(photoGPS);
+
 			Marker marker = new Marker(map);
 			marker.setPosition(GPSCentered);
 			marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
@@ -221,7 +224,6 @@ public class LoadExternalPhotosActivity extends Activity{
 		@Override
 		public void onItemClick(AdapterView<?> arg0, View v, int position,
 				long id) {
-			Log.i(TAG,"Click on list");
 			List<GpsGeom> allGpsGeom = Sync.allGpsGeom;
 			ArrayList<GeoPoint> photoGPS = null;
 			for(GpsGeom gg : allGpsGeom){
@@ -230,7 +232,8 @@ public class LoadExternalPhotosActivity extends Activity{
 				}
 			}
 			GeoPoint GPSCentered = MathOperation.barycenter(photoGPS);
-			displayedMap = new GeoActivity(false, GPSCentered, map);
+			map.getController().setCenter(GPSCentered);
+			map.getController().setZoom(map.getMaxZoomLevel());
 			map.invalidate();
 		}
 	};

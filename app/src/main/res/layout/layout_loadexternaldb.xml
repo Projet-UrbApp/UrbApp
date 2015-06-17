@@ -25,13 +25,14 @@
             android:id="@+id/group"
             android:layout_width="wrap_content"
             android:layout_height="fill_parent" 
-            android:orientation="horizontal" >   
+            android:orientation="horizontal">
               
         <ListView
             android:id="@+id/listView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1" />
+            android:layout_weight="1"
+            android:drawSelectorOnTop="true"/>
         
         <org.osmdroid.views.MapView
                   android:id="@+id/mapView"
@@ -39,9 +40,6 @@
          android:layout_weight="1"
          android:layout_height="match_parent"/>
         </LinearLayout>
-        
-
-        
         
     </LinearLayout>
 
