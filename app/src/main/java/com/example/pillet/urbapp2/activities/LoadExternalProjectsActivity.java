@@ -68,7 +68,9 @@ public class LoadExternalProjectsActivity extends Activity {
      * The instance of GeoActivity for map activity
      */
     public GeoActivity displayedMap;
-    private int click =0;
+    private int firstClick =-1;
+    private int secondClick = -1;
+    private int numberClicked = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,10 +99,16 @@ public class LoadExternalProjectsActivity extends Activity {
     public OnMarkerClickListener markerClick  = new OnMarkerClickListener() {
         @Override
         public boolean onMarkerClick(Marker marker, MapView mapView) {
-            if (click == 0) {
+            if(numberClicked==2)
+                numberClicked =0;
+            if (numberClicked==0){
                 Toast.makeText(MainActivity.baseContext, "Appuyer une seconde fois pour charger le projet", Toast.LENGTH_SHORT).show();
-                click=1;
-            } else if (click == 1) {
+                firstClick=projectMarkers.get(marker.getTitle());
+            }
+            if(numberClicked==1)
+                secondClick=projectMarkers.get(marker.getTitle());
+            numberClicked++;
+            if (secondClick == firstClick) {
 
                 Toast.makeText(MainActivity.baseContext, "Chargement du projet", Toast.LENGTH_SHORT).show();
                 Intent i = new Intent(getApplicationContext(), LoadExternalPhotosActivity.class);
@@ -115,7 +123,9 @@ public class LoadExternalProjectsActivity extends Activity {
                 }
                 i.putExtra("PROJECT_COORD", ConvertGeom.GeoPointToGpsGeom(coordProjet));
                 startActivityForResult(i, 1);
-                click=0;
+                firstClick=-1;
+                secondClick=-1;
+                numberClicked=0;
             }
             return true;
         }
@@ -162,6 +172,8 @@ public class LoadExternalProjectsActivity extends Activity {
             marker.setPanToView(true);
             marker.setOnMarkerClickListener(markerClick);
             map.getOverlays().add(marker);
+            map.getController().setCenter(coordProjet);
+            map.getController().setZoom(map.getMaxZoomLevel());
             projectMarkers.put(marker.getTitle(), i);
         	toList.add(i+" - "+enCours.getProjectName());
         	i++;
@@ -173,25 +185,56 @@ public class LoadExternalProjectsActivity extends Activity {
    }
     
     /**
-     *  get the project selected in listview and show its position on the map 
+     *  get the project selected in listview and show its position on the map
+     *  two click on the same project will load the project
+     *  you can click once  and then on the map marker and vice versa
      */
     
     public OnItemClickListener selectedProject = new OnItemClickListener()
     {
 		@Override
 		public void onItemClick(AdapterView<?> arg0, View v, int position, long id) {
-            Log.i(TAG,"Click on list");
-			GeoPoint coordProjet = null;
+
+
+            GeoPoint coordProjet = null;
 
         	for(GpsGeom gg : allGpsGeom){
         		if(refreshedValues.get(position).getGpsGeom_id()==gg.getGpsGeomsId()){
         			coordProjet = MathOperation.barycenter(ConvertGeom.gpsGeomToGeoPoint(gg));
         		}
-        	}
-			displayedMap = new GeoActivity(false, coordProjet, map);
-            Log.i(TAG,"lat = "+coordProjet.getLatitude()+" lng = "+coordProjet.getLongitude());
+            }
+            map.getController().setCenter(coordProjet);
             map.getController().setZoom(map.getMaxZoomLevel());
             map.invalidate();
+
+            if(numberClicked==2)
+                numberClicked =0;
+            if (numberClicked==0){
+                Toast.makeText(MainActivity.baseContext, "Appuyer une seconde fois pour charger le projet", Toast.LENGTH_SHORT).show();
+                firstClick=position;
+            }
+            if(numberClicked==1)
+                secondClick=position;
+            numberClicked++;
+            if (secondClick == firstClick) {
+
+                Toast.makeText(MainActivity.baseContext, "Chargement du projet", Toast.LENGTH_SHORT).show();
+                Intent i = new Intent(getApplicationContext(), LoadExternalPhotosActivity.class);
+                i.putExtra("SELECTED_PROJECT_ID", refreshedValues.get(position).getProjectId());
+
+                ArrayList<GeoPoint> coordProjet1 = new ArrayList<GeoPoint>();
+
+                for (GpsGeom gg : allGpsGeom) {
+                    if (refreshedValues.get(position).getGpsGeom_id() == gg.getGpsGeomsId()) {
+                        coordProjet1.addAll(ConvertGeom.gpsGeomToGeoPoint(gg));
+                    }
+                }
+                i.putExtra("PROJECT_COORD", ConvertGeom.GeoPointToGpsGeom(coordProjet1));
+                startActivityForResult(i, 1);
+                firstClick=-1;
+                secondClick=-1;
+                numberClicked=0;
+            }
 		}};
     
     @Override
