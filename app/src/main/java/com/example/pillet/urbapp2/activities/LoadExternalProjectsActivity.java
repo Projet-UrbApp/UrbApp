@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import android.graphics.Color;
 import android.util.Log;
 import android.app.Activity;
 import android.content.Intent;
@@ -71,6 +72,7 @@ public class LoadExternalProjectsActivity extends Activity {
     private int firstClick =-1;
     private int secondClick = -1;
     private int numberClicked = 0;
+    private int save=-1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,9 +98,20 @@ public class LoadExternalProjectsActivity extends Activity {
         listeProjects.setOnItemClickListener(selectedProject);
 
     }
+
+    /**
+     * A click on a marker will highlight the respective project name on the list
+     * two clicks will load the project
+     */
     public OnMarkerClickListener markerClick  = new OnMarkerClickListener() {
         @Override
         public boolean onMarkerClick(Marker marker, MapView mapView) {
+
+            listeProjects.getChildAt(projectMarkers.get(marker.getTitle())).setBackgroundColor(Color.LTGRAY);
+            if(save != -1 && save != projectMarkers.get(marker.getTitle())){
+                listeProjects.getChildAt(save).setBackgroundColor(Color.argb(0, 238, 238, 238));
+            }
+            save = projectMarkers.get(marker.getTitle());
             if(numberClicked==2)
                 numberClicked =0;
             if (numberClicked==0){
@@ -130,6 +143,7 @@ public class LoadExternalProjectsActivity extends Activity {
             return true;
         }
     };
+
     protected void onClose() {      
         datasource.close();
     }
@@ -169,7 +183,6 @@ public class LoadExternalProjectsActivity extends Activity {
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
             marker.setIcon(this.getResources().getDrawable(R.drawable.marker_icon));
             marker.setTitle("Cliquez ici pour charger le projet : " + i);
-            marker.setPanToView(true);
             marker.setOnMarkerClickListener(markerClick);
             map.getOverlays().add(marker);
             map.getController().setCenter(coordProjet);
@@ -195,9 +208,13 @@ public class LoadExternalProjectsActivity extends Activity {
 		@Override
 		public void onItemClick(AdapterView<?> arg0, View v, int position, long id) {
 
+            arg0.getChildAt(position).setBackgroundColor(Color.LTGRAY);
+            if(save != -1 && save != position){
+                arg0.getChildAt(save).setBackgroundColor(Color.argb(0, 238, 238, 238));
+            }
+            save = position;
 
             GeoPoint coordProjet = null;
-
         	for(GpsGeom gg : allGpsGeom){
         		if(refreshedValues.get(position).getGpsGeom_id()==gg.getGpsGeomsId()){
         			coordProjet = MathOperation.barycenter(ConvertGeom.gpsGeomToGeoPoint(gg));
