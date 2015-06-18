@@ -191,6 +191,9 @@ public class MySQLiteHelper extends SQLiteOpenHelper {
 					    + TABLE_MATERIAL + " (" 
 					    + COLUMN_MATERIALID   + " INTEGER PRIMARY KEY AUTOINCREMENT, "
 					    + COLUMN_MATERIALNAME + " text not null "
+						+ COLUMN_MATERIALCONDUCT + "DOUBLE PRECISION"
+						+ COLUMN_MATERIALHEAT + "INTEGER"
+						+ COLUMN_MATERIALMASS + "INTEGER"
 					    +");"
 	    ;
 		/**

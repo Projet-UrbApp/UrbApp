@@ -27,6 +27,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -97,8 +98,6 @@ public class HomeFragment extends Fragment implements OnClickListener{
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 		View v = inflater.inflate(R.layout.layout_home, null);
-
-		
 		
 		imageTakePhoto = (ImageView) v.findViewById(R.id.home_image_newProject_takePhoto);
 		imageTakePhoto.setOnClickListener(this);
@@ -156,7 +155,7 @@ public class HomeFragment extends Fragment implements OnClickListener{
 		} else if (id == R.id.home_image_loadDistantProject) {
 			i = new Intent(this.getActivity(), LoadExternalProjectsActivity.class);
 			getActivity().startActivityForResult(i,Cst.CODE_LOAD_EXTERNAL_PROJECT);
-		} else if (id == R.id.home_syncMatAndTypes) {
+		} else if (id == R.id.home_syncMatAndTypes){
 			/**
 			 * Launch the dialog to make user waits
 			 */
@@ -194,31 +193,28 @@ public class HomeFragment extends Fragment implements OnClickListener{
 				doc.appendChild(rootElement);
 				 
 				for (Material m : MainActivity.material) {
-					
 					// materiau node
 					Element materiau = doc.createElement("materiau");
 					rootElement.appendChild(materiau);
-					
+
 					// set attribute id
-					Attr attr = doc.createAttribute("id");
-					attr.setValue(Long.toString(m.getMaterial_id()));
-					materiau.setAttributeNode(attr);					
-			 
+					materiau.setAttribute("id",Long.toString(m.getMaterial_id()));
+
 					// name node
 					Element nom = doc.createElement("nom");
 					nom.appendChild(doc.createTextNode(m.getMaterial_name()));
-					materiau.appendChild(nom);					
-			 
+					materiau.appendChild(nom);
+
 					// conductivity node
 					Element conductivite = doc.createElement("conductivite");
-					conductivite.appendChild(doc.createTextNode(Float.toString(m.getMaterial_conduct())));
+					conductivite.appendChild(doc.createTextNode(Double.toString(m.getMaterial_conduct())));
 					materiau.appendChild(conductivite);
-			 
+
 					// heat capacity node
 					Element capacite_thermique = doc.createElement("capacite_thermique");
 					capacite_thermique.appendChild(doc.createTextNode(Long.toString(m.getMaterial_heat_capa())));
 					materiau.appendChild(capacite_thermique);
-			 
+
 					// mass density node
 					Element masse_volumique = doc.createElement("masse_volumique");
 					masse_volumique.appendChild(doc.createTextNode(Long.toString(m.getMaterial_mass_density())));
@@ -231,10 +227,8 @@ public class HomeFragment extends Fragment implements OnClickListener{
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
 			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(new File("/storage/sdcard0/Liste_Materiaux.xml"));
+			StreamResult result = new StreamResult(System.out/*new File("/storage/sdcard0/Liste_Materiaux.xml")*/);
 			transformer.transform(source, result);
-
-
 			} catch (ParserConfigurationException | TransformerException pce) {
 				pce.printStackTrace();
 		  	}

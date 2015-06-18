@@ -16,7 +16,7 @@ public class Material extends DataObject  {
 	/**
 	 * String value of conductivity 
 	 */
-	private float material_conduct;
+	private double material_conduct;
 	/**
 	 * String value of heat capacity
 	 */
@@ -47,7 +47,7 @@ public class Material extends DataObject  {
 	 * getter for the attribute conductivity of material
 	 * @return float material_conduct
 	 */
-	public float getMaterial_conduct() {
+	public double getMaterial_conduct() {
 		return material_conduct;
 	}
 	
@@ -89,7 +89,7 @@ public class Material extends DataObject  {
 	 * setter for the conductivity of material
 	 * @param material_conduct float
 	 */
-	public void setMaterial_conduct(float material_conduct) {
+	public void setMaterial_conduct(double material_conduct) {
 		this.material_conduct = material_conduct;
 	}
 	
@@ -124,14 +124,14 @@ public class Material extends DataObject  {
 	 */
 	@Override
 	public void saveToLocal(LocalDataSource datasource) {
-		ContentValues values = new ContentValues(); 
+		ContentValues values = new ContentValues();
 		
 		values.put(MySQLiteHelper.COLUMN_MATERIALNAME, this.material_name);
 		
 		if(this.registredInLocal){
 			String[] s=new String[1];
 			s[0]= ""+this.material_id;
-			datasource.getDatabase().update(MySQLiteHelper.TABLE_MATERIAL, values, MySQLiteHelper.COLUMN_MATERIALID,s );
+			datasource.getDatabase().update(MySQLiteHelper.TABLE_MATERIAL, values, MySQLiteHelper.COLUMN_MATERIALID, s);
 		}
 		else{
 			datasource.getDatabase().insert(MySQLiteHelper.TABLE_MATERIAL, null, values);
