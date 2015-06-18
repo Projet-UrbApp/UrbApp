@@ -46,10 +46,10 @@ import com.google.gson.Gson;
 /**
  * All the maters of 
  * @author Sebastien
- *
  */
 public class Sync
 {
+	private static final String TAG = "sync";
 	/**
 	 * MaxId and timestamp
 	 */
@@ -103,7 +103,6 @@ public class Sync
 		{
 			e.printStackTrace();
 		}
-
 		return success;
 	}
 
@@ -121,10 +120,7 @@ public class Sync
 			success = true;
 		}
 		catch (Exception e)
-		{
-
-		}
-
+		{}
 		return success;
 	}
 
@@ -143,10 +139,7 @@ public class Sync
 			success = true;
 		}
 		catch (Exception e)
-		{
-
-		}
-
+		{}
 		return success;
 	}
 
@@ -164,10 +157,7 @@ public class Sync
 			success = true;
 		}
 		catch (Exception e)
-		{
-
-		}
-
+		{}
 		return success;
 	}
 
@@ -830,6 +820,7 @@ public class Sync
 					String line = null;
 
 					while ((line = reader.readLine()) != null) {
+						Log.i(TAG,line);
 						sb.append(line);
 					}
 				}
@@ -891,12 +882,16 @@ public class Sync
 					JSONObject project = materialsInner.getJSONObject(i);
 					long material_id = project.getLong("material_id");
 					String material_name = project.getString("material_name");
+					long material_heat = project.getInt("material_heat_capa");
+					long material_mass = project.getInt("material_mass_density");
+					Double material_conductivity = project.getDouble("material_conduct");
 
 					Material materialEnCours = new Material();
 					materialEnCours.setMaterial_id(material_id);
 					materialEnCours.setMaterial_name(material_name);
-
-
+					materialEnCours.setMaterial_conduct(material_conductivity);
+					materialEnCours.setMaterial_heat_capa(material_heat);
+					materialEnCours.setMaterial_mass_density(material_mass);
 					MainActivity.material.add(materialEnCours);
 				}
 
@@ -909,11 +904,9 @@ public class Sync
 					long elementType_id = photo.getLong("elementType_id");
 					String elementType_name = photo.getString("elementType_name");
 
-
 					ElementType elmtTypeEnCours = new ElementType();
 					elmtTypeEnCours.setElementType_id(elementType_id );
 					elmtTypeEnCours.setElementType_name(elementType_name);
-
 
 					MainActivity.elementType.add(elmtTypeEnCours);
 				}
