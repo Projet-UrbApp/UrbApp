@@ -85,7 +85,6 @@ public class Sync
 	 */
 	public static ArrayList<PixelGeom> allPixelGeom = new ArrayList<PixelGeom>();
 
-
 	/**
 	 * Launch the sync to external DB (export mode)
 	 * @param upload_photo
@@ -169,16 +168,38 @@ public class Sync
 		if(maxId.isEmpty()) {
 			try {
 				maxId = new BackTastMaxId().execute().get();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			} catch (ExecutionException e) {
+			} catch (InterruptedException | ExecutionException e) {
 				e.printStackTrace();
 			}
 		}
 		return maxId;
 	}
 
-
+	public String projectID(int id){
+		IsProjectIdExist projectIdExist = new IsProjectIdExist(id);
+		try{
+			Integer res = projectIdExist.execute().get();
+			boolean res2 = MainActivity.datasource.existProjectWithId((long)id);
+			String str  = null;
+			if(res==1 && res2)
+			{
+				str = "External : Ok | Local : Ok";
+			}else if(res==0 && res2)
+			{
+				str = "External : No | Local : Ok";
+			} else if(res==1 && !res2)
+			{
+				str = "External : Ok | Local : No";
+			}else if (res==0 && !res2)
+			{
+				str = "External : No | Local : No";
+			}
+			return str;
+		}catch (InterruptedException | ExecutionException e){
+			e.printStackTrace();
+			return null;
+		}
+	}
 
 	/**
 	 * The additional threat to upload data to the server
@@ -204,7 +225,6 @@ public class Sync
 		 * Pre Execution orders
 		 */
 		protected void onPreExecute(){
-
 			super.onPreExecute();
 			Toast.makeText(MainActivity.baseContext,  "Début de l'exportation", Toast.LENGTH_SHORT).show();
 		}
@@ -239,13 +259,10 @@ public class Sync
 				 * File upload request
 				 */
 				File mImage = new File(Environment.getExternalStorageDirectory(), "featureapp/"+MainActivity.photo.getPhoto_url());
-
 				doFileUpload(mImage);
 			}
-
 			return postData(jSonComplete);
 		}
-
 
 		/**
 		 * The posting method to server
@@ -270,22 +287,14 @@ public class Sync
 					BufferedReader reader =
 							new BufferedReader(new InputStreamReader(response.getEntity().getContent()), 65728);
 					String line = null;
-
 					while ((line = reader.readLine()) != null) {
 						sb.append(line);
 					}
-				}
-				catch (IOException e) { e.printStackTrace(); }
-				catch (Exception e) { e.printStackTrace(); }
-
+				} catch (Exception e) { e.printStackTrace(); }
 				return sb.toString();
-
-			} catch (ClientProtocolException e) {
-				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			} ;
-
 			return null;
 		}
 
@@ -304,7 +313,7 @@ public class Sync
 
 			int bytesRead, bytesAvailable, bufferSize;
 			byte[] buffer;
-			int maxBufferSize = 1*1024*1024;
+			int maxBufferSize = 1024*1024;
 			int sentBytes = 0;
 			long fileSize = file.length();
 
@@ -366,8 +375,6 @@ public class Sync
 				connection.getResponseCode();
 
 				connection.getResponseMessage();
-
-
 				fileInputStream.close();
 				outputStream.flush();
 				outputStream.close();
@@ -401,8 +408,65 @@ public class Sync
 			}
 			SaveFragment.dialog.dismiss();
 		}
+	}
 
+	public class IsProjectIdExist extends AsyncTask<Void,Integer,Integer>{
+		private Context mContext;
+		protected Integer project_id;
 
+		public IsProjectIdExist(int id){
+			super();
+			this.mContext = MainActivity.baseContext;
+			project_id =id;
+		}
+
+		@Override
+		protected Integer doInBackground(Void... params) {
+			String JSON = getData();
+			try{
+				JSONObject jObj = new JSONObject(JSON);
+				Integer exist;
+				try{
+					exist = jObj.getInt("exist");
+					return exist;
+				}catch(Exception e){
+					return null;
+				}
+			}catch(JSONException e){
+				Log.e("JSON Parser", "Error parsing data " + e.toString());
+				return null;
+			}
+		}
+
+		public String getData(){
+			HttpClient httpclient = new DefaultHttpClient();
+			// specify the URL you want to post to
+			HttpPost httppost = new HttpPost(MainActivity.serverURL+"projectID.php");
+			try {
+				List<BasicNameValuePair> nameValuePairs = new ArrayList<BasicNameValuePair>();
+				nameValuePairs.add(new BasicNameValuePair("project_id", project_id.toString()));
+				httppost.setEntity(new UrlEncodedFormEntity(nameValuePairs,"UTF-8"));
+				// send the variable and value, in other words post, to the URL
+				HttpResponse response = httpclient.execute(httppost);
+
+				StringBuilder sb = new StringBuilder();
+				try {
+					BufferedReader reader =
+							new BufferedReader(new InputStreamReader(response.getEntity().getContent()), 65728);
+					String line = null;
+
+					while ((line = reader.readLine()) != null) {
+						sb.append(line);
+					}
+				} catch (Exception e) { e.printStackTrace(); }
+
+				return sb.toString();
+
+			} catch (IOException e) {
+				e.printStackTrace();
+			} ;
+			return "error";
+		}
 	}
 
 	/**
@@ -455,7 +519,6 @@ public class Sync
 			}
 		}
 
-
 		/**
 		 * The request method to server
 		 * @return the string of the server response
@@ -487,7 +550,6 @@ public class Sync
 			return "error";
 		}
 
-
 		/**
 		 * The things to execute after the backTask 
 		 */
@@ -500,7 +562,6 @@ public class Sync
 			}
 		}
 	}
-
 
 	/**
 	 * The additional threat to get projects and gpsgeom data from server
@@ -570,7 +631,6 @@ public class Sync
 			return null;
 		}
 
-
 		/**
 		 * The request method to server
 		 * @return the string of the server response
@@ -598,14 +658,10 @@ public class Sync
 					while ((line = reader.readLine()) != null) {
 						sb.append(line);
 					}
-				}
-				catch (IOException e) { e.printStackTrace(); }
-				catch (Exception e) { e.printStackTrace(); }
+				} catch (Exception e) { e.printStackTrace(); }
 
 				return sb.toString();
 
-			} catch (ClientProtocolException e) {
-				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			} ;
@@ -634,7 +690,6 @@ public class Sync
 
 		/**
 		 * Ask the server and save all data on the specific var
-		 * @return
 		 */
 		protected Void doInBackground(Void... params) {
 
@@ -788,12 +843,11 @@ public class Sync
 					Log.e("JSON Parser", "Error parsing data " + e.toString());
 				}
 			} catch (Exception e) {
-
+				e.printStackTrace();
 			}
 
 			return null;
 		}
-
 
 		/**
 		 * The request method to server
@@ -823,14 +877,10 @@ public class Sync
 						Log.i(TAG,line);
 						sb.append(line);
 					}
-				}
-				catch (IOException e) { e.printStackTrace(); }
-				catch (Exception e) { e.printStackTrace(); }
+				} catch (Exception e) { e.printStackTrace(); }
 
 				return sb.toString();
 
-			} catch (ClientProtocolException e) {
-				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			} ;
@@ -838,7 +888,6 @@ public class Sync
 		}
 
 	}
-
 
 	/**
 	 * The additional threat to get projects and gpsgeom data from server
@@ -866,13 +915,11 @@ public class Sync
 
 		/**
 		 * Ask the server and save all data on the specific var
-		 * @return
 		 */
 		protected Void doInBackground(Void... params) {
 			String JSON = getData();
 			try {
 				JSONArray jArr = new JSONArray(JSON);
-
 
 				JSONObject materials = jArr.getJSONObject(0);
 				JSONArray materialsInner = materials.getJSONArray("Material");
@@ -910,14 +957,11 @@ public class Sync
 
 					MainActivity.elementType.add(elmtTypeEnCours);
 				}
-
-
 			} catch (JSONException e) {
 				Log.e("JSON Parser", "Error parsing data " + e.toString());
 			}
 			return null;
 		}
-
 
 		/**
 		 * The request method to server
@@ -939,21 +983,16 @@ public class Sync
 
 				StringBuilder sb = new StringBuilder();
 				try {
-					BufferedReader reader =
-							new BufferedReader(new InputStreamReader(response.getEntity().getContent()), 65728);
+					BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()), 65728);
 					String line = null;
 
 					while ((line = reader.readLine()) != null) {
 						sb.append(line);
 					}
-				}
-				catch (IOException e) { e.printStackTrace(); }
-				catch (Exception e) { e.printStackTrace(); }
+				} catch (Exception e) { e.printStackTrace(); }
 
 				return sb.toString();
 
-			} catch (ClientProtocolException e) {
-				e.printStackTrace();
 			} catch (IOException e) {
 				e.printStackTrace();
 			} ;
