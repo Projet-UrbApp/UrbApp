@@ -227,7 +227,7 @@ public class HomeFragment extends Fragment implements OnClickListener{
 			transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 			transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "3");
 			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(System.out/*new File("/storage/sdcard0/Liste_Materiaux.xml")*/);
+			StreamResult result = new StreamResult(new File("/storage/sdcard0/Liste_Materiaux.xml"));
 			transformer.transform(source, result);
 			} catch (ParserConfigurationException | TransformerException pce) {
 				pce.printStackTrace();
