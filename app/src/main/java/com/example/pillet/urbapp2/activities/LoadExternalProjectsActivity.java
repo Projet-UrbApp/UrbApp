@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.util.Log;
 import android.app.Activity;
@@ -13,7 +14,6 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -24,7 +24,7 @@ import com.example.pillet.urbapp2.db.Project;
 import com.example.pillet.urbapp2.syncToExt.Sync;
 import com.example.pillet.urbapp2.utils.ConvertGeom;
 import com.example.pillet.urbapp2.utils.MathOperation;
-
+import com.example.pillet.urbapp2.dialogs.SelectChoiceLoadProjectDialogFragment;
 import org.osmdroid.api.IMapController;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.views.MapView;
@@ -33,13 +33,13 @@ import org.osmdroid.bonuspack.overlays.Marker;
 import org.osmdroid.bonuspack.overlays.Marker.OnMarkerClickListener;
 
 /**
- * 
  * @author Sebastien
- *
  */
 public class LoadExternalProjectsActivity extends Activity {
+
     private static final String TAG = "externalProjects";
-	/**
+	public static Context baseContext;
+    /**
 	 * creating datasource
 	 */
 	private LocalDataSource datasource;
@@ -47,12 +47,10 @@ public class LoadExternalProjectsActivity extends Activity {
 	 * Contains all the projects attributes
 	 */
 	public List<Project> refreshedValues;
-	
 	/**
 	 * COntains all GPSInfo from all Project
 	 */
 	public List<GpsGeom> allGpsGeom;
-	
 	/**
 	 * Hashmap between unique id of markers and the relative project_id
 	 */
@@ -76,6 +74,7 @@ public class LoadExternalProjectsActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        baseContext= getBaseContext();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout_loadexternaldb);
         datasource=MainActivity.datasource;
@@ -96,7 +95,6 @@ public class LoadExternalProjectsActivity extends Activity {
         refreshList();
         
         listeProjects.setOnItemClickListener(selectedProject);
-
     }
 
     /**
@@ -118,24 +116,19 @@ public class LoadExternalProjectsActivity extends Activity {
                 Toast.makeText(MainActivity.baseContext, "Appuyer une seconde fois pour charger le projet", Toast.LENGTH_SHORT).show();
                 firstClick=projectMarkers.get(marker.getTitle());
             }
+            map.getController().setCenter(marker.getPosition());
+            map.getController().setZoom(map.getMaxZoomLevel());
+            map.invalidate();
             if(numberClicked==1)
                 secondClick=projectMarkers.get(marker.getTitle());
             numberClicked++;
             if (secondClick == firstClick) {
-
-                Toast.makeText(MainActivity.baseContext, "Chargement du projet", Toast.LENGTH_SHORT).show();
-                Intent i = new Intent(getApplicationContext(), LoadExternalPhotosActivity.class);
-                i.putExtra("SELECTED_PROJECT_ID", refreshedValues.get(projectMarkers.get(marker.getTitle())).getProjectId());
-
-                ArrayList<GeoPoint> coordProjet = new ArrayList<GeoPoint>();
-
-                for (GpsGeom gg : allGpsGeom) {
-                    if (refreshedValues.get(projectMarkers.get(marker.getTitle())).getGpsGeom_id() == gg.getGpsGeomsId()) {
-                        coordProjet.addAll(ConvertGeom.gpsGeomToGeoPoint(gg));
-                    }
-                }
-                i.putExtra("PROJECT_COORD", ConvertGeom.GeoPointToGpsGeom(coordProjet));
-                startActivityForResult(i, 1);
+                SelectChoiceLoadProjectDialogFragment loadProjectDialog = new SelectChoiceLoadProjectDialogFragment();
+                loadProjectDialog.position = projectMarkers.get(marker.getTitle());
+                loadProjectDialog.allGpsGeom = allGpsGeom;
+                loadProjectDialog.refreshedValues = refreshedValues;
+                loadProjectDialog.show(getFragmentManager(),null);
+                refreshList();
                 firstClick=-1;
                 secondClick=-1;
                 numberClicked=0;
@@ -164,12 +157,12 @@ public class LoadExternalProjectsActivity extends Activity {
     		}
     	}
     	
-    	List<String> toList = new ArrayList<String>();
+    	List<String> toList = new ArrayList<>();
     	
         /**
          * Put markers on the map
          */
-        Integer i = Integer.valueOf(0);
+        Integer i = 0;
         for (Project enCours:refreshedValues){
 			GeoPoint coordProjet = null;
         	for(GpsGeom gg : allGpsGeom){
@@ -188,12 +181,13 @@ public class LoadExternalProjectsActivity extends Activity {
             map.getController().setCenter(coordProjet);
             map.getController().setZoom(map.getMaxZoomLevel());
             projectMarkers.put(marker.getTitle(), i);
-        	toList.add(i+" - "+enCours.getProjectName());
+            Sync sync =  new Sync();
+        	toList.add(i+" - "+enCours.getProjectName()+"          " + sync.projectID((int)refreshedValues.get(i).getProjectId()));
         	i++;
         }
 
 		map.invalidate();
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, toList);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, toList);
         listeProjects.setAdapter(adapter);
    }
     
@@ -234,20 +228,12 @@ public class LoadExternalProjectsActivity extends Activity {
                 secondClick=position;
             numberClicked++;
             if (secondClick == firstClick) {
-
-                Toast.makeText(MainActivity.baseContext, "Chargement du projet", Toast.LENGTH_SHORT).show();
-                Intent i = new Intent(getApplicationContext(), LoadExternalPhotosActivity.class);
-                i.putExtra("SELECTED_PROJECT_ID", refreshedValues.get(position).getProjectId());
-
-                ArrayList<GeoPoint> coordProjet1 = new ArrayList<GeoPoint>();
-
-                for (GpsGeom gg : allGpsGeom) {
-                    if (refreshedValues.get(position).getGpsGeom_id() == gg.getGpsGeomsId()) {
-                        coordProjet1.addAll(ConvertGeom.gpsGeomToGeoPoint(gg));
-                    }
-                }
-                i.putExtra("PROJECT_COORD", ConvertGeom.GeoPointToGpsGeom(coordProjet1));
-                startActivityForResult(i, 1);
+                SelectChoiceLoadProjectDialogFragment loadProjectDialog = new SelectChoiceLoadProjectDialogFragment();
+                loadProjectDialog.position = position;
+                loadProjectDialog.allGpsGeom = allGpsGeom;
+                loadProjectDialog.refreshedValues = refreshedValues;
+                loadProjectDialog.show(getFragmentManager(),null);
+                refreshList();
                 firstClick=-1;
                 secondClick=-1;
                 numberClicked=0;
