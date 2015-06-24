@@ -13,7 +13,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 public class LocalDataSource {
-	
+	private static final String TAG = "localDataSource";
 	//Database fields
 	/**
 	 * database attributes which contains the database (need to open and close it for each actions)
@@ -151,7 +151,7 @@ public class LocalDataSource {
         c.moveToFirst();
         Project p1 = cursorToProject(c);
         c.close();
-        return p1;
+		return p1;
     }
 
 	/**
@@ -160,8 +160,10 @@ public class LocalDataSource {
 	 * @return boolean says if the project with this id exists or not
 	 */
     public Boolean existProjectWithId(Long id){
-        Cursor c = database.query(MySQLiteHelper.TABLE_PROJECT, allColumnsProject, MySQLiteHelper.COLUMN_PROJECTID + " = \"" + id +"\"", null, null, null, null);
-        if(c.getCount()>0){
+        Cursor c = database.rawQuery("SELECT CASE WHEN EXISTS (SELECT * FROM "
+				+ MySQLiteHelper.TABLE_PROJECT
+				+ " WHERE " + MySQLiteHelper.COLUMN_PROJECTID+"="+id +") THEN CAST (1 AS BIT) ELSE CAST(0 AS CBIT) END",null);
+		if(c.getCount()>0){
             c.close();
             return true;
         }
@@ -178,9 +180,10 @@ public class LocalDataSource {
 	public void deleteProject(Project p1){
 		long id = p1.getProjectId();
 		System.out.println("Project deleted with id: "+ id);
+		System.out.println(database.getPath());
 		database.delete(MySQLiteHelper.TABLE_PROJECT, MySQLiteHelper.COLUMN_PROJECTID+" = "+ id, null);
 	}
-	
+
 	/**
 	 * query to get project information
 	 * 
