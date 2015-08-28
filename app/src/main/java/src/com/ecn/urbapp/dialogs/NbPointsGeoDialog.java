@@ -1,4 +1,4 @@
-package com.example.pillet.urbapp2.dialogs;
+package src.com.ecn.urbapp.dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -7,8 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import com.example.pillet.urbapp2.R;
-import com.example.pillet.urbapp2.activities.GeoActivity;
-import com.example.pillet.urbapp2.activities.MainActivity;
+import src.com.ecn.urbapp.activities.GeoActivity;
+import src.com.ecn.urbapp.activities.MainActivity;
 
 /**
  * Dialog for the choice of number of points to put in GpsGeom
