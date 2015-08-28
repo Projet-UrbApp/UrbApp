@@ -153,7 +153,7 @@ public class LoadLocalPhotosActivity extends Activity{
 		rowItems = new ArrayList<RowItem>();
 		int cajou=0;
 		for (Photo image:refreshedValues) {
-			RowItem item = new RowItem(Environment.getExternalStorageDirectory()+"/featureapp/"+image.getPhoto_url(),"Photo n°"+cajou,image.getPhoto_description());
+			RowItem item = new RowItem(Environment.getExternalStorageDirectory()+"/featureapp/"+image.getPhoto_url(),"Photo n°"+cajou,image.getPhoto_description(),image.getPhoto_id());
 			rowItems.add(item);
 			cajou++;
 		}

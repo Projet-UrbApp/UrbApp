@@ -66,7 +66,7 @@ public class Composed extends DataObject{
 		values.put(MySQLiteHelper.COLUMN_PROJECTID, this.project_id);
 		values.put(MySQLiteHelper.COLUMN_PHOTOID, this.photo_id);
 		
-		if(!this.registredInLocal){
+		if(!this.registredInLocal) {
 			datasource.getDatabase().insert(MySQLiteHelper.TABLE_COMPOSED, null, values);
 		}else
 		{

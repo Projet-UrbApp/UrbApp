@@ -3,6 +3,7 @@ package src.com.ecn.urbapp.db;
 import java.util.ArrayList;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 
 import src.com.ecn.urbapp.activities.MainActivity;
 import src.com.ecn.urbapp.syncToExt.Sync;
@@ -121,16 +122,19 @@ public class Project extends DataObject {
 			datasource.getDatabase().update(MySQLiteHelper.TABLE_PROJECT, values, str, null);
 		}
 		else{
-			//Cursor cursor = datasource.getDatabase().rawQuery(GETMAXPROJECTID, null);
-			//cursor.moveToFirst();
+
+			/*Cursor cursor = datasource.getDatabase().rawQuery(GETMAXPROJECTID, null);
+			cursor.moveToFirst();
+			*/
+
 			long old_id = this.getProjectId();
 			//long new_id = 1+cursor.getLong(0);
-			Sync maxSync = new Sync();
-			long new_id = (long) maxSync.getMaxId().get("Project")+1; //1+this.project_id+Sync.getMaxId().get("Project");
+
+			long new_id = 1+this.project_id+Sync.getMaxId().get("Project");
 			this.setProjectId(new_id);
 			this.trigger(old_id, new_id, MainActivity.composed);
 
-			values.put(MySQLiteHelper.COLUMN_PROJECTID, new_id);
+			values.put(MySQLiteHelper.COLUMN_PROJECTID, this.project_id);
 			values.put(MySQLiteHelper.COLUMN_GPSGEOMID, this.gpsGeom_id);
 			datasource.getDatabase().insert(MySQLiteHelper.TABLE_PROJECT, null, values);
 			this.setRegistredInLocal(true);
@@ -142,11 +146,11 @@ public class Project extends DataObject {
 	 * 
 	 */
 	private static final String
-		GETMAXPROJECTID = 
-			"SELECT "+MySQLiteHelper.TABLE_PROJECT+"."+MySQLiteHelper.COLUMN_PROJECTID+" FROM "
-			+ MySQLiteHelper.TABLE_PROJECT
-			+" ORDER BY "+MySQLiteHelper.TABLE_PROJECT+"."+MySQLiteHelper.COLUMN_PROJECTID
-			+" DESC LIMIT 1 ;"
+		GETMAXPROJECTID =
+			"SELECT "+MySQLiteHelper.TABLE_PHOTO+"."+MySQLiteHelper.COLUMN_PHOTOID+" FROM "
+					+ MySQLiteHelper.TABLE_PHOTO
+					+" ORDER BY "+MySQLiteHelper.TABLE_PHOTO+"."+MySQLiteHelper.COLUMN_PHOTOID
+					+" DESC LIMIT 1 ;"
 		;
 	/**
 	 * trigger method is used to update foreign keys in the dataObjects

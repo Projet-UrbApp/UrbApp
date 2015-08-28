@@ -8,11 +8,14 @@ public class RowItem {
 	//TODO Adddescription for javadoc
     private String desc;
 
+    private long id;
+
 	//TODO Adddescription for javadoc
-    public RowItem(String imagePath, String title, String desc) {
+    public RowItem(String imagePath, String title, String desc, long id) {
         this.imagePath = imagePath;
         this.title = title;
         this.desc = desc;
+        this.id = id;
     }
 	//TODO Adddescription for javadoc
     public String getImagePath() {
@@ -38,7 +41,12 @@ public class RowItem {
     public void setTitle(String title) {
         this.title = title;
     }
-	//TODO Adddescription for javadoc
+
+    public long getId() {
+        return id;
+    }
+
+    //TODO Adddescription for javadoc
     @Override
     public String toString() {
         return title + "\n" + desc;

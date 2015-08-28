@@ -93,8 +93,6 @@ public class LoadExternalPhotosActivity extends Activity{
 
 	private Polygon polygon;
 
-	private ArrayList<Photo> photoList = Sync.refreshedValuesPhoto;
-
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.layout_loadexternalphotos);
@@ -135,7 +133,7 @@ public class LoadExternalPhotosActivity extends Activity{
 	public OnMarkerClickListener markerClick  = new OnMarkerClickListener() {
 		@Override
 		public boolean onMarkerClick(Marker marker, MapView mapView) {
-		for (Photo actualPhoto:photoList) {
+		for (Photo actualPhoto:Sync.refreshedValuesPhoto) {
 			if ((int)actualPhoto.getPhoto_id() == photosMarkers.get(marker.getTitle()))
 				MainActivity.photo = actualPhoto;
 		}
@@ -167,13 +165,13 @@ public class LoadExternalPhotosActivity extends Activity{
     	}
 		rowItems = new ArrayList<RowItem>();
 		synchronized(refreshedValues){
-			int i=0;
+			int i=1;
 			for (Photo image:refreshedValues) {
 				/**
 				 * Download each photo and register it on tablet
 				 */
 				String imageStoredUrl = imageDownloader.download(MainActivity.serverURL+"images/", image.getPhoto_url());
-				RowItem item = new RowItem(Environment.getExternalStorageDirectory()+"/featureapp/"+image.getPhoto_url(),"Photo n°"+i,image.getPhoto_description());
+				RowItem item = new RowItem(Environment.getExternalStorageDirectory()+"/featureapp/"+image.getPhoto_url(),"Photo n°"+i,image.getPhoto_description(),image.getPhoto_id());
 				rowItems.add(item);
 				i++;
 			}
@@ -225,26 +223,26 @@ public class LoadExternalPhotosActivity extends Activity{
 		@Override
 		public void onItemClick(AdapterView<?> arg0, View v, int position,
 				long id) {
-		List<GpsGeom> allGpsGeom = Sync.allGpsGeom;
-		ArrayList<GeoPoint> photoGPS = null;
-		for(GpsGeom gg : allGpsGeom){
-			if(gg.getGpsGeomsId()==refreshedValues.get(position).getGpsGeom_id()){
-				photoGPS = ConvertGeom.gpsGeomToGeoPoint(gg);
+			List<GpsGeom> allGpsGeom = Sync.allGpsGeom;
+			ArrayList<GeoPoint> photoGPS = null;
+			for(GpsGeom gg : allGpsGeom){
+				if(gg.getGpsGeomsId()==refreshedValues.get(position).getGpsGeom_id()){
+					photoGPS = ConvertGeom.gpsGeomToGeoPoint(gg);
+				}
 			}
-		}
-		GeoPoint GPSCentered = MathOperation.barycenter(photoGPS);
-		map.getController().setCenter(GPSCentered);
-		map.getController().setZoom(map.getMaxZoomLevel());
-		map.invalidate();
+			GeoPoint GPSCentered = MathOperation.barycenter(photoGPS);
+			map.getController().setCenter(GPSCentered);
+			map.getController().setZoom(map.getMaxZoomLevel());
+			map.invalidate();
 
-		for (Photo actualPhoto :photoList) {
-			if ((int)actualPhoto.getPhoto_id() == position)
-				MainActivity.photo = actualPhoto;
-		}
-		MainActivity.photo.setUrlTemp(Environment.getExternalStorageDirectory() + "/featureapp/" + MainActivity.photo.getPhoto_url());
-		setResult(RESULT_OK);
-		finish();
-		Toast.makeText(MainActivity.baseContext, "Chargement de la photo", Toast.LENGTH_SHORT).show();
+			for (Photo actualPhoto :Sync.refreshedValuesPhoto) {
+				if ((int)actualPhoto.getPhoto_id() == position)
+					MainActivity.photo = actualPhoto;
+			}
+			MainActivity.photo.setUrlTemp(Environment.getExternalStorageDirectory() + "/featureapp/" + MainActivity.photo.getPhoto_url());
+			setResult(RESULT_OK);
+			finish();
+			Toast.makeText(MainActivity.baseContext, "Chargement de la photo", Toast.LENGTH_SHORT).show();
 		}
 	};
 
