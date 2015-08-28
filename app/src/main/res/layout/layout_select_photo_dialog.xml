@@ -14,11 +14,6 @@
         android:id="@+id/modifyButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Charger"/>
-    <Button
-        android:id="@+id/exportButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/export"
-        android:layout_centerHorizontal="true" />
+        android:text="@string/modify"/>
+
 </RelativeLayout>

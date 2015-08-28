@@ -21,7 +21,7 @@
         android:paddingRight="@dimen/ambilwarna_spacer"
         android:paddingTop="@dimen/ambilwarna_spacer" android:layout_gravity="center">
 
-        <com.example.pillet.urbapp2.utils.colorpicker.AmbilWarnaKotak
+        <src.com.ecn.urbapp.utils.colorpicker.AmbilWarnaKotak
             android:id="@+id/ambilwarna_viewSatBri"
             android:layout_width="@dimen/ambilwarna_hsvWidth"
             android:layout_height="@dimen/ambilwarna_hsvHeight"

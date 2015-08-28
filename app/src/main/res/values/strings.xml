@@ -100,4 +100,8 @@
 	<string name="facade">Façade (2 points)</string>
 	<string name="sol">Sol (Plusieurs points)</string>
     <string name="location">location</string>
+    <string name="export">Exporter</string>
+    <string name="delete">Supprimer</string>
+    <string name="modify">Modifier</string>
+
 </resources>
