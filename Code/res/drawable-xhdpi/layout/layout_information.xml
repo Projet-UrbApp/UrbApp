@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+/**
+ * @author	COHENDET Sébastien
+ * 			DAVID Nicolas
+ * 			GUILBART Gabriel
+ * 			PALOMINOS Sylvain
+ * 			PARTY Jules
+ * 			RAMBEAU Merwan
+ * 
+ * information layout
+ * 
+ * This layout is used in the information fragment. The sizes will be be defined by the java code.
+ * 			
+ */
+ -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal" >
+
+        <RelativeLayout
+            android:layout_width="75dp"
+            android:layout_height="fill_parent"
+        	android:src="@drawable/image"
+         	android:layout_marginLeft="180dp"
+         	android:layout_marginTop="90dp">
+            
+            <TextView
+                android:id="@+id/info_text_author"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/info_text_author"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"/>
+            
+            <TextView
+                android:id="@+id/info_text_description"
+                android:layout_width="wrap_content"
+                android:layout_height="55dp"
+                android:text="@string/info_text_description"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/info_text_author"
+         		android:layout_marginTop="8dp"/>
+            
+            <TextView
+                android:id="@+id/info_text_project"
+                android:layout_width="wrap_content"
+                android:layout_height="35dp"
+                android:text="@string/info_text_project"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/info_text_description"/>
+            
+            <TextView
+                android:id="@+id/info_text_adress"
+                android:layout_height="35dp"
+                android:layout_width="wrap_content"
+                android:text="@string/info_text_adress"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/info_text_project"/>
+            
+            <TextView
+                android:id="@+id/info_text_void"
+                android:layout_height="35dp"
+                android:layout_width="wrap_content"
+                android:text="@string/info_text_void"
+                android:layout_alignParentRight="true"
+                android:layout_below="@+id/info_text_adress"/>
+            
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="270dp"
+            android:layout_height="fill_parent"
+         	android:layout_marginTop="80dp" >
+            
+            <EditText
+                android:id="@+id/info_edit_author"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/info_edit_author"
+                android:inputType="text"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentTop="true"/>
+            
+            <EditText
+                android:id="@+id/info_edit_description"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/info_edit_author"
+                android:hint="@string/info_edit_description"
+                android:inputType="text"/>
+            
+            <EditText
+                android:id="@+id/info_edit_project"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/info_edit_description"
+                android:hint="@string/info_edit_project"
+                android:inputType="text"/>
+            
+            <EditText
+                android:id="@+id/info_edit_adress"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/info_edit_adress"
+                android:inputType="text"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/info_edit_project"/>
+            <EditText
+                android:id="@+id/info_edit_adressComplement"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/info_edit_complement"
+                android:inputType="text"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/info_edit_adress"/>
+            
+            <Button
+                android:id="@+id/info_button_geo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/info_button_geo"
+                android:layout_alignParentLeft="true"
+                android:layout_below="@+id/info_edit_adressComplement"/>
+        </RelativeLayout>
+</LinearLayout>

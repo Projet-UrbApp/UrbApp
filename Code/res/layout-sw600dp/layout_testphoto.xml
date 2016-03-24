@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical" >
+
+        <LinearLayout
+            android:id="@+id/group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/addPhoto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onClick"
+                android:text="Add New Photo" />
+            
+            <EditText 
+			    android:id="@+id/nameToAdd"
+			    android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_margin="10dp"
+			    android:hint="name"
+		    />
+
+            
+        </LinearLayout>
+        
+        <LinearLayout
+            android:id="@+id/group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" 
+            android:orientation="horizontal" >
+
+            <Button
+                android:id="@+id/deletePhoto"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="onClick"
+                android:text="Delete First" />
+            
+           <EditText 
+			    android:id="@+id/idToDelete"
+			    android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_margin="10dp"
+			    android:hint="id"
+		    />
+           
+           
+           
+           <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="or" />
+           
+           <EditText 
+			    android:id="@+id/nameToDelete"
+			    android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_margin="10dp"
+			    android:hint="name"
+		    />
+            
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/group"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+           
+            <EditText 
+			    android:id="@+id/test_photo_project_idtolink"
+			    android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_margin="10dp"
+			    android:hint="project_id"
+			    android:inputType="numberDecimal"
+		    />
+            
+           <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="and" />
+            
+            <EditText 
+			    android:id="@+id/test_photo_photo_idtolink"
+			    android:layout_width="wrap_content"
+	            android:layout_height="wrap_content"
+	            android:layout_margin="10dp"
+			    android:hint="photo_id"
+			    android:inputType="numberDecimal"
+		    />
+
+            <Button
+                android:id="@+id/test_photo_create_link"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="10dp"
+                android:text="create link" />
+
+           
+        </LinearLayout>
+
+
+
+        <ListView
+            android:id="@android:id/list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.52"
+            android:text="test element 2" />
+    </LinearLayout>
+
+</LinearLayout> 

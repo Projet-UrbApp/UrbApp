@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * This layout is used in the definition fragment. The sizes will be be defined by the java code.
+ *
+ * @author	COHENDET Sébastien
+ * 			DAVID Nicolas
+ * 			GUILBART Gabriel
+ * 			PALOMINOS Sylvain
+ * 			PARTY Jules
+ * 			RAMBEAU Merwan
+ * 			
+ */
+-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/definition_type_linear_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/definition_type_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="@string/definition_dialog_type"
+            android:textColor="#000000" />
+
+        <Spinner
+            android:id="@+id/typeZone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/type" />
+        
+        <EditText
+            android:id="@+id/typeZone_custom"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:inputType= "text"
+            android:visibility="gone"
+            android:hint="@string/other"
+            android:textColor="#000000" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/definition_material_linear_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/definition_type_linear_layout"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/definition_material_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="@string/definition_dialog_material"
+            android:textColor="#000000" />
+
+        <Spinner
+            android:id="@+id/materialZone"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:entries="@array/frontagematerial" />
+        
+        <EditText
+            android:id="@+id/materialZone_custom"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:inputType= "text"
+            android:visibility="gone"
+            android:hint="@string/other"
+            android:textColor="#000000" />
+    </LinearLayout>
+    
+    <LinearLayout
+        android:id="@+id/definition_color_linear_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/definition_material_linear_layout"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/definition_color_textview"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:text="@string/definition_dialog_color"
+            android:textColor="#000000" />
+
+        <View
+        	android:id="@+id/color"
+        	android:layout_width="150dp"
+        	android:layout_height="30dp"
+        	android:layout_marginLeft="80dip"
+        	android:layout_marginBottom="30dip" />
+        
+    </LinearLayout>
+    
+    <RelativeLayout
+        android:id="@+id/definition_validation_linear_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/definition_color_linear_layout"
+        android:orientation="horizontal" >
+
+        <Button
+        	android:id="@+id/validation"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:layout_alignParentRight="true"
+        	android:text="@string/ok"/>
+        
+    </RelativeLayout>
+
+</RelativeLayout>

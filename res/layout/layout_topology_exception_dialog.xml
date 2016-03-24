@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * This layout is used in the definition fragment. The sizes will be be defined by the java code.
+ *
+ * @author	COHENDET Sébastien
+ * 			DAVID Nicolas
+ * 			GUILBART Gabriel
+ * 			PALOMINOS Sylvain
+ * 			PARTY Jules
+ * 			RAMBEAU Merwan
+ * 			
+ */
+-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/topology_exception_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="L'application n'est pas parvenue à gérer les intersections entre les zones déjà définies et la nouvelle zone.\nNous ne pouvons donc pas autoriser l'ajout de cette zone.\nEssayer de la décomposer en zones avec moins d'intersections."
+            android:textColor="#000000" />
+
+
+        <Button
+        	android:id="@+id/confirm_ok_topo"
+        	android:layout_width="wrap_content"
+        	android:layout_height="wrap_content"
+        	android:layout_alignParentRight="true"
+        	android:layout_below="@+id/topology_exception_text"
+        	android:text="@string/ok"/>
+        
+
+</RelativeLayout>
