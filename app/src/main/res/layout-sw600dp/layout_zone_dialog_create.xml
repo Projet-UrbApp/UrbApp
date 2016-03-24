@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * This layout is used in the definition fragment. The sizes will be be defined by the java code.
+ *
+ * @author	COHENDET Sébastien
+ * 			DAVID Nicolas
+ * 			GUILBART Gabriel
+ * 			PALOMINOS Sylvain
+ * 			PARTY Jules
+ * 			RAMBEAU Merwan
+ * 			
+ */
+-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="horizontal" >
+
+    <Button 
+        android:id="@+id/zone_button_create_intersect"
+       	android:layout_width="200dp"
+       	android:layout_height="wrap_content"
+       	android:layout_marginTop="20dp"
+       	android:text="@string/zone_create_intersect"/>
+
+    <Button
+        android:id="@+id/zone_button_create_add"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/zone_button_create_intersect"
+      	android:layout_marginTop="20dp"
+        android:text="@string/zone_create_add" />
+
+</RelativeLayout>

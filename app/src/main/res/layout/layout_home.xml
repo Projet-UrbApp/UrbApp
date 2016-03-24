@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+/**
+ * @author	COHENDET Sébastien
+ * 			DAVID Nicolas
+ * 			GUILBART Gabriel
+ * 			PALOMINOS Sylvain
+ * 			PARTY Jules
+ * 			RAMBEAU Merwan
+ * 
+ * home layout
+ * 
+ * This layout is used in the home fragment. The sizes will be be defined by the java code.
+ * 			
+ */
+-->
+
+
+<!-- Load image action -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:orientation="horizontal" >
+
+    <RelativeLayout
+        android:id="@+id/home_layout_newProject"
+        android:layout_width="400dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="100dp" >
+
+        <ImageView
+            android:id="@+id/home_image_newProject_takePhoto"
+            android:layout_width="wrap_content"
+            android:layout_height="200dp"
+            android:layout_alignParentTop="true"
+            android:contentDescription="@string/image_newProject_takePhoto"
+            android:src="@drawable/take_photo" />
+
+        <ImageView
+            android:id="@+id/home_image_newProject_photo"
+            android:layout_width="wrap_content"
+            android:layout_height="200dp"
+            android:layout_below="@+id/home_image_newProject_takePhoto"
+            android:contentDescription="@string/image_newProject_photo"
+            android:src="@drawable/photo" />
+
+        <!--
+            <Button
+                android:id="@+id/home_takePicture"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/home_image_newProject_photo"
+                android:layout_alignParentLeft="true"
+                android:text="@string/takePicture"/>
+            
+            <Button
+                android:id="@+id/home_loadPicture"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/home_takePicture"
+                android:layout_alignParentLeft="true"
+                android:text="@string/loadPicture"/>
+        -->
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/home_layout_localProject"
+        android:layout_width="400dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerInParent="true"
+        android:layout_marginTop="100dp" >
+
+        <ImageView
+            android:id="@+id/home_image_loadLocalProject"
+            android:layout_width="wrap_content"
+            android:layout_height="400dp"
+            android:layout_alignParentTop="true"
+            android:contentDescription="@string/image_loadLocalProject"
+            android:src="@drawable/local" />
+
+        <!--
+             <Button
+	         android:id="@+id/home_loadLocalProject"
+	         android:layout_width="match_parent"
+	         android:layout_height="wrap_content"
+	         android:layout_below="@+id/home_image_loadLocalProject"
+	         android:layout_alignParentLeft="true"
+	         android:text="@string/loadLocalProject"/>
+	         
+	         <Button
+	         android:id="@+id/home_test"
+	         android:layout_width="match_parent"
+	         android:layout_height="wrap_content"
+	         android:layout_below="@+id/home_loadLocalProject"
+	         android:layout_alignParentLeft="true"
+	         android:text="test"/>
+	         
+	                  <Button
+	         android:id="@+id/home_test_photo"
+	         android:layout_width="match_parent"
+	         android:layout_height="wrap_content"
+	         android:layout_below="@+id/home_test"
+	         android:layout_alignParentLeft="true"
+	         android:text="test photo"/>
+        -->
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/home_layout_distantProject"
+        android:layout_width="400dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="100dp" >
+
+        <ImageView
+            android:id="@+id/home_image_loadDistantProject"
+            android:layout_width="400dp"
+            android:layout_height="400dp"
+            android:layout_alignParentTop="true"
+            android:contentDescription="@string/image_loadDistantProject"
+            android:src="@drawable/ext" />
+
+        <!--
+                 <Button
+                 android:id="@+id/home_loadDistantlProject"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:layout_below="@+id/home_image_loadDistantProject"
+                 android:layout_alignParentLeft="true"
+                 android:text="@string/loadDistantlProject"/>
+        -->
+
+    </RelativeLayout>
+        <Button
+            android:id="@+id/home_exportButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="Export la liste des matériaux" />
+
+        <Button
+            android:id="@+id/home_syncMatAndTypes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:text="Sync" />
+</RelativeLayout>

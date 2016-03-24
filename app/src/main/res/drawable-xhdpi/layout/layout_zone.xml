@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+/**
+ * This layout is used in the zone fragment. The sizes will be be defined by the java code.
+ *
+ * @author	COHENDET Sébastien
+ * 			DAVID Nicolas
+ * 			GUILBART Gabriel
+ * 			PALOMINOS Sylvain
+ * 			PARTY Jules
+ * 			RAMBEAU Merwan
+ * 
+ */
+ -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+    
+    <Button 
+        android:id="@+id/zone_button_create"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:onClick="zone_button_create"
+        android:text="@string/zone_create"/>
+    
+    <Button 
+        android:id="@+id/zone_button_delete"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:onClick="zone_button_delete"
+        android:layout_toRightOf="@+id/zone_button_create"
+        android:text="@string/zone_delete"/>
+    
+    <Button 
+        android:id="@+id/zone_button_edit"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:onClick="zone_button_edit"
+        android:layout_toRightOf="@+id/zone_button_delete"
+        android:text="@string/zone_edit"/>
+
+    <ImageView
+        android:id="@+id/image_zone"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/zone_button_create"
+        android:src="@drawable/image" />
+
+    <!-- the following elements are for the creation of a zone -->
+    <Button
+        android:id="@+id/zone_create_button_back"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:onClick="zone_create_button_back"
+        android:text="@string/back"/>
+
+    <Button
+        android:id="@+id/zone_create_button_help"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:onClick="zone_create_button_help"
+        android:text="@string/help" />
+
+    <Button
+        android:id="@+id/zone_create_button_cancel"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/zone_create_button_back"
+        android:onClick="zone_create_button_cancel"
+        android:text="@string/cancel" />
+
+    <Button
+        android:id="@+id/zone_create_button_validate"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/zone_create_button_cancel"
+        android:onClick="zone_create_button_validate"
+        android:text="@string/validate" />
+    
+      <Button 
+        android:id="@+id/zone_create_button_edit"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:onClick="zone_button_edit"
+        android:layout_toRightOf="@+id/zone_create_button_validate"
+        android:text="@string/zone_edit"/>
+    
+    <!-- the following elements are for the deletion of a zone -->
+    <Button
+        android:id="@+id/zone_delete_button_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="@string/cancel" />
+
+    <Button
+        android:id="@+id/zone_delete_button_help"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:text="@string/help" />
+    
+    
+    <!-- the following elements are for the edition of a zone -->
+
+    <Button
+        android:id="@+id/zone_edit_button_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:text="@string/cancel" />
+
+    <Button
+        android:id="@+id/zone_edit_button_validate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/zone_edit_button_cancel"
+        android:text="@string/validate" />
+    
+    <Button
+        android:id="@+id/zone_edit_button_delete_point"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/zone_edit_button_validate"
+        android:text="@string/zone_edit_button_delete_point" />
+    
+    <Button
+        android:id="@+id/zone_edit_button_release_point"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_toRightOf="@+id/zone_edit_button_delete_point"
+        android:text="@string/zone_edit_button_release_point" />
+
+    <Button
+        android:id="@+id/zone_edit_button_help"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:text="@string/help" />
+    
+</RelativeLayout>

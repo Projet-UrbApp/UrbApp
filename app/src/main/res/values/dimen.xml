@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--  This file is used to create a number picker dialog -->
+
+<!--  This class is taken from : http://code.google.com/p/android-color-picker/ -->
+<!--  (under Apache licence 2.0) -->
+
+<resources>
+	<dimen name="ambilwarna_hsvHeight">240dp</dimen>
+	<dimen name="ambilwarna_hsvWidth">240dp</dimen>
+	<dimen name="ambilwarna_hueWidth">30dp</dimen>
+	<dimen name="ambilwarna_spacer">8dp</dimen>
+</resources>

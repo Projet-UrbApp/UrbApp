@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+/**
+ * This layout is used in the definition fragment. The sizes will be be defined by the java code.
+ *
+ * @author	COHENDET Sébastien
+ * 			DAVID Nicolas
+ * 			GUILBART Gabriel
+ * 			PALOMINOS Sylvain
+ * 			PARTY Jules
+ * 			RAMBEAU Merwan
+ * 			
+ */
+ -->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <ImageView
+        android:id="@+id/definition_image"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/definition_void"/>
+    
+    <Button 
+        android:id="@+id/definition_button_define"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:text="@string/definition_define"/>
+    
+    <Button 
+        android:id="@+id/definition_button_delete"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/definition_button_define"
+        android:text="@string/definition_delete"/>
+    
+    <Button 
+        android:id="@+id/definition_button_recap"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:text="@string/definition_recap"/>
+
+    <Button
+        android:id="@+id/definition_void"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:text=""/>
+</RelativeLayout>
