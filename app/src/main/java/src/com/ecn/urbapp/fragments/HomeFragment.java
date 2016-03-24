@@ -33,7 +33,6 @@ import src.com.ecn.urbapp.syncToExt.Sync;
 import src.com.ecn.urbapp.utils.Cst;
 import src.com.ecn.urbapp.utils.Utils;
 
-
 /**
  * This is the fragment used to make the user choose between the differents type of project.
  * 
@@ -49,31 +48,7 @@ import src.com.ecn.urbapp.utils.Utils;
 @SuppressLint("SimpleDateFormat")
 public class HomeFragment extends Fragment implements OnClickListener{
 
-	/**
-	 * Image button to launch the photo native application
-	 */
-	private ImageView imageTakePhoto;
-	/**
-	 * Image button to launch the native document browser application
-	 */
-	private ImageView imagePhoto;
-	/**
-	 * Image button launching the activity LoadLocalProject
-	 */
-	private ImageView imageLoadLocal;
-	/**
-	 * Image button launching the activity LoadDistantProject
-	 */
-	private ImageView imageLoadDistant;
-	/**
-	 * The button for synchronizing materials and types from server
-	 */
-	private Button syncMat = null;
-	/** 
-	 * The button for exporting materials in XML file
-	 */
-	private Button exportMat = null;
-
+	public static final String LOGTAG = "HomeFragment" ;
 	public static ProgressDialog dialogMater;
 
 	@Override
@@ -83,25 +58,44 @@ public class HomeFragment extends Fragment implements OnClickListener{
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-		View v = inflater.inflate(R.layout.layout_home, null);
+
+        View v = inflater.inflate(R.layout.layout_home, null);
 		
-		imageTakePhoto = (ImageView) v.findViewById(R.id.home_image_newProject_takePhoto);
+		/*
+	  Image button to launch the photo native application
+	 */
+		ImageView imageTakePhoto = (ImageView) v.findViewById(R.id.home_image_newProject_takePhoto);
 		imageTakePhoto.setOnClickListener(this);
 		
-		imagePhoto = (ImageView) v.findViewById(R.id.home_image_newProject_photo);
+		/*
+	  Image button to launch the native document browser application
+	 */
+		ImageView imagePhoto = (ImageView) v.findViewById(R.id.home_image_newProject_photo);
 		imagePhoto.setOnClickListener(this);
 		
-		imageLoadLocal = (ImageView) v.findViewById(R.id.home_image_loadLocalProject);
+		/*
+	  Image button launching the activity LoadLocalProject
+	 */
+		ImageView imageLoadLocal = (ImageView) v.findViewById(R.id.home_image_loadLocalProject);
 		imageLoadLocal.setOnClickListener(this);
 		
-		imageLoadDistant = (ImageView) v.findViewById(R.id.home_image_loadDistantProject);
+		/*
+	  Image button launching the activity LoadDistantProject
+	 */
+		ImageView imageLoadDistant = (ImageView) v.findViewById(R.id.home_image_loadDistantProject);
 		imageLoadDistant.setOnClickListener(this);
 		
-		syncMat = (Button) v.findViewById(R.id.home_syncMatAndTypes);
+		/*
+	  The button for synchronizing materials and types from server
+	 */
+		Button syncMat = (Button) v.findViewById(R.id.home_syncMatAndTypes);
 		syncMat.setOnClickListener(this);
 		syncMat.setVisibility(View.GONE);//need to fix the bug, don't delete but update the table
 		
-		exportMat = (Button) v.findViewById(R.id.home_exportButton);
+		/*
+	  The button for exporting materials in XML file
+	 */
+		Button exportMat = (Button) v.findViewById(R.id.home_exportButton);
 		exportMat.setOnClickListener(this);
 		
 		return v;

@@ -24,7 +24,6 @@
 
     <application
         android:allowBackup="true"
-        android:debuggable="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
@@ -52,6 +51,8 @@
             android:screenOrientation="landscape"/>
         <activity android:name="src.com.ecn.urbapp.utils.UploadImage"
             android:theme="@android:style/Theme.Dialog"
+            android:screenOrientation="landscape"/>
+        <activity android:name="src.com.ecn.urbapp.activities.AugmentedRealityActivity"
             android:screenOrientation="landscape"/>
 
         <meta-data

@@ -8,6 +8,7 @@
     <string name="saveFragment">Sauvegarde et synchronisation</string>
     <string name="zoneFragment">Définition des zones</string>
     <string name="informationFragment">Informations</string>
+    <string name="AR_Activity">Réalité augmentée</string>
     
     <string name="syncMatAndTypes">charger les matériaux et Types du serveur</string>
     <string name="image_newProject">Image : nouveau projet</string>
@@ -104,4 +105,14 @@
     <string name="delete">Supprimer</string>
     <string name="modify">Modifier</string>
 
+    <string name="open_drawer">Open drawer</string>
+    <string name="close_drawer">Close drawer</string>
+
+    <!-- Resources for Augmented Reality activity-->
+    <string name="ar_validation">Activate !</string>
+    <string name="ar_instruction">Set up the image with two-touch gestures</string>
+    <string name="ar_add_image">Add image</string>
+    <string name="ar_rotate">Rotate</string>
+
 </resources>
+

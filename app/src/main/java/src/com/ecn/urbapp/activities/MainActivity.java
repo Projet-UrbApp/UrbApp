@@ -4,17 +4,21 @@ import java.util.ArrayList;
 import java.util.Vector;
 
 import android.app.ActionBar;
-import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.app.AlertDialog.Builder;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
-import android.view.MenuInflater;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import com.example.pillet.urbapp2.R;
@@ -32,7 +36,6 @@ import src.com.ecn.urbapp.fragments.HomeFragment;
 import src.com.ecn.urbapp.fragments.InformationFragment;
 import src.com.ecn.urbapp.fragments.SaveFragment;
 import src.com.ecn.urbapp.fragments.ZoneFragment;
-import src.com.ecn.urbapp.listener.MyTabListener;
 import src.com.ecn.urbapp.syncToExt.Sync;
 import src.com.ecn.urbapp.utils.ConnexionCheck;
 import src.com.ecn.urbapp.utils.Cst;
@@ -147,18 +150,20 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);		
-		
+
+		setContentView(R.layout.activity_main);
+
 		//Instanciation of the elements  for the database
-		composed = new ArrayList<Composed>();
-		element = new ArrayList<Element>();
-		elementType = new ArrayList<ElementType>();
-		gpsGeom = new ArrayList<GpsGeom>();
-		material = new ArrayList<Material>();
-		pixelGeom = new ArrayList<PixelGeom>();
-		project = new ArrayList<Project>();
+		composed = new ArrayList<>();
+		element = new ArrayList<>();
+		elementType = new ArrayList<>();
+		gpsGeom = new ArrayList<>();
+		material = new ArrayList<>();
+		pixelGeom = new ArrayList<>();
+		project = new ArrayList<>();
 		photo = new Photo();
 		
-		fragments=new Vector<Fragment>();
+		fragments=new Vector<>();
 		//Setting the Context of app
 		baseContext = getBaseContext();
 		
@@ -170,52 +175,66 @@ public class MainActivity extends Activity {
 		
 		//initialization of the local database
 		datasource = new LocalDataSource(this);
-		
-		//Setting the Activity bar
-		bar = getActionBar();
-		bar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-		bar.setDisplayHomeAsUpEnabled(true);
-		
-		//Home tab
-		Tab tabHome =  bar.newTab();
-		tabHome.setText(R.string.homeFragment);
-		HomeFragment home = new HomeFragment();
-		tabHome.setTabListener(new MyTabListener(home));
-		bar.addTab(tabHome);
-		fragments.add(home);
-		
-		//Information tab
-		Tab tabInformation =  bar.newTab();
-		tabInformation.setText(R.string.informationFragment);
-		InformationFragment information = new InformationFragment();
-		tabInformation.setTabListener((new MyTabListener(information)));
-		bar.addTab(tabInformation);
-		fragments.add(information);
-		
-		//Zone tab
-		Tab tabZone =  bar.newTab();
-		tabZone.setText(R.string.zoneFragment);
-		zone = new ZoneFragment();
-		tabZone.setTabListener(new MyTabListener(zone));
-		bar.addTab(tabZone);
-		fragments.add(zone);
-		
-		//Definition tab
-		Tab tabDefinition =  bar.newTab();
-		tabDefinition.setText(R.string.definitionFragment);
-		CharacteristicsFragment definition = new CharacteristicsFragment();
-		tabDefinition.setTabListener(new MyTabListener(definition));
-		bar.addTab(tabDefinition);
-		fragments.add(definition);
-		
-		//Save tab
-		Tab tabSave =  bar.newTab();
-		tabSave.setText(R.string.saveFragment);
-		SaveFragment save = new SaveFragment();
-		tabSave.setTabListener(new MyTabListener(save));
-		bar.addTab(tabSave);
-		fragments.add(save);
-		
+
+
+		//Creating Tabs String array
+		String[] mtabsList = new String[]{
+				getString(R.string.homeFragment),
+				getString(R.string.informationFragment),
+				getString(R.string.zoneFragment),
+				getString(R.string.definitionFragment),
+				getString(R.string.saveFragment),
+				getString(R.string.AR_Activity)
+			};
+
+
+		//Setting the Activity drawer
+		final FragmentManager fragmentManager = getFragmentManager();
+
+		HomeFragment homeFragment = new HomeFragment();
+		fragmentManager.beginTransaction().replace(R.id.container,homeFragment).commit();
+
+		final DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+		final ListView mDrawerList = (ListView) findViewById(R.id.left_drawer);
+
+		mDrawerList.setAdapter(new ArrayAdapter<>(this,
+				R.layout.drawer_list_item, mtabsList));
+
+		mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+				switch (i) {
+					case 0:
+						HomeFragment homeFragment = new HomeFragment();
+						fragmentManager.beginTransaction().replace(R.id.container, homeFragment).commit();
+						break;
+					case 1:
+						InformationFragment informationFragment = new InformationFragment();
+						fragmentManager.beginTransaction().replace(R.id.container, informationFragment).commit();
+						break;
+					case 2:
+						ZoneFragment zoneFragment = new ZoneFragment();
+						fragmentManager.beginTransaction().replace(R.id.container, zoneFragment).commit();
+						break;
+					case 3:
+						CharacteristicsFragment definitionFragment = new CharacteristicsFragment();
+						fragmentManager.beginTransaction().replace(R.id.container, definitionFragment).commit();
+						break;
+					case 4:
+						SaveFragment saveFragment = new SaveFragment();
+						fragmentManager.beginTransaction().add(R.id.container, saveFragment).commit();
+						break;
+					case 5:
+						Intent intent = new Intent(baseContext,AugmentedRealityActivity.class);
+						startActivity(intent);
+						break ;
+				}
+				mDrawerList.setItemChecked(i, true);
+				mDrawerLayout.closeDrawer(mDrawerList);
+			}
+		});
+
+
 		//TODO coordinate with the remote databasetellip
 		datasource.open();
 		datasource.getAllElementType();
@@ -236,8 +255,8 @@ public class MainActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu, this adds items to the action bar if it is present.
-		MenuInflater inflater =	getMenuInflater();
-		inflater.inflate(R.menu.menu_main, menu);
+//		MenuInflater inflater =	getMenuInflater();
+//		inflater.inflate(R.menu.menu_main, menu);
 		return super.onCreateOptionsMenu(menu);
 	}
 
